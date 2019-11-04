@@ -414,6 +414,7 @@
 					<argLine>-XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI
 						--module-path=${compiler.dir}
 						--upgrade-module-path=${compiler.dir}/compiler.jar</argLine>
+					<useSystemClassLoader>false</useSystemClassLoader>
 				</configuration>
 			</plugin>
 			<plugin>
