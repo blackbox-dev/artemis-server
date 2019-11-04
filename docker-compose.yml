@@ -1,0 +1,12 @@
+version: '1.0'
+services:
+  influxdb:
+    image: signalk:influxdb
+    container_name: influxdb
+    ports:
+      - 8086:8086
+      - 8088:8088
+    volumes:
+      - /var/lib/influxdb:/var/lib/influxdb:Z
+    command: influxd
+    network_mode: host
