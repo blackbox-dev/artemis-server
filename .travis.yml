@@ -4,7 +4,7 @@ sudo: required
 jdk:
   - openjdk13
 
-script: mvn clean test jacoco:report
+script: mvn clean jacoco:prepare-agent install jacoco:report
 
 services:
   - docker
