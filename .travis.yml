@@ -4,7 +4,7 @@ sudo: required
 jdk:
   - openjdk13
 
-script: mvn clean verify
+script: mvn clean test jacoco:report
 
 services:
   - docker
