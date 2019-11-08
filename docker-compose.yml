@@ -10,3 +10,11 @@ services:
       - /var/lib/influxdb:/var/lib/influxdb:Z
     command: influxd
     network_mode: host
+  couchdb:
+    build: docker/couchdb
+    container_name: couchdb
+    ports:
+      - 5984:5984
+    volumes:
+      - ./docker/couchdb/data:/opt/couchdb/data
+    network_mode: host
