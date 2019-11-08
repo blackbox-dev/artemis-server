@@ -1,6 +1,8 @@
 Artemis Server
 ==============
 
+[![Build Status](https://travis-ci.com/blackbox-dev/artemis-server.svg?branch=master)](https://travis-ci.com/blackbox-dev/artemis-server) [![codecov](https://codecov.io/gh/blackbox-dev/artemis-server/branch/master/graph/badge.svg)](https://codecov.io/gh/blackbox-dev/artemis-server)
+
 This is the 2nd gen replacement for the original signalk-java-server. 
 
 The primary reason for at least two implementations of a signalk server is to ensure we dont  create a node application instead of a generic communication standard in signalk.  This has already been avoided several times, as the node-server is quite RPi/web-browser oriented, resulting in node/npm/http dependencies creeping in to webapp deployments, IoT device requirements,  and node specialised server-side requirements. 
