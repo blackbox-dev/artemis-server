@@ -623,6 +623,15 @@ public class Util {
 		return false;
 	}
 
+	public static boolean isLogBookFormat(Json node) {
+		if (node == null)
+			return false;
+		// only accept important syntax
+		if(node.has(vessels) || node.has(sar) || node.has(CONFIG))
+			return true;
+		return false;
+	}
+
 	public static String readString(ServletInputStream inputStream, String characterEncoding) throws IOException {
 		try (ByteArrayOutputStream result = new ByteArrayOutputStream();) {
 			byte[] buffer = new byte[1024];
