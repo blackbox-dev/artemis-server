@@ -186,6 +186,11 @@ public class SignalKConstants {
 	public static final String vessels_id = "vessels.*";
 	public static final String pgn = "pgn";
 
+	// logbook
+	public static final String logbook="logbook";
+	public static final String event="event";
+	public static final String auto="auto";
+
 
 	//temp
 	public static final String env_time_time = "environment.time.time";
