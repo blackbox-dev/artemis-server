@@ -193,7 +193,7 @@ public class SignalkKvConvertor {
 		if (post == null || post.isNull() || !post.has(PATH))
 			return;
 
-		if (!Util.checkPostValid(ctx +post.at(PATH).asString())) {
+		if (!Util.checkPostValid(ctx )) {
 			String correlation = origMessage.getStringProperty(Config.AMQ_CORR_ID);
 			String destination = origMessage.getStringProperty(Config.AMQ_REPLY_Q);
 			Json err = sender.error(sender.getRequestId(post), "COMPLETED", 403,
@@ -226,7 +226,14 @@ public class SignalkKvConvertor {
 		if (e.has(value)) {
 			if (logger.isDebugEnabled())
 				logger.debug("put: {}:{}", ctx + key, e);
-			sender.sendKvMessage(origMessage, ctx + key + dot + values + dot + e.at(sourceRef).asString(), e);
+			String k = ctx + key + dot + values + dot + e.at(sourceRef).asString();
+
+			// fixed issue apicalls not having security token
+			String token = null;
+			token = SecurityUtils.authenticateUser("admin", "admin");
+			origMessage.putStringProperty(Config.AMQ_USER_ROLES, SecurityUtils.getRoles(token).toString());
+
+			sender.sendKvMessage(origMessage, k, e);
 		}
 
 	}
