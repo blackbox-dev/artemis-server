@@ -2,37 +2,7 @@ package nz.co.fortytwo.signalk.artemis.util;
 
 import static nz.co.fortytwo.signalk.artemis.util.Config.ADMIN_USER;
 import static nz.co.fortytwo.signalk.artemis.util.Config.AMQ_USER_TOKEN;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.ALL;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.CONFIG;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.GET;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.KNOTS_TO_MS;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.LIST;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.LOGIN;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.LOGOUT;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.MS_TO_KNOTS;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.PLAYBACK_RATE;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.POST;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.PUT;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.START_TIME;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.SUBSCRIBE;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.UNSUBSCRIBE;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.UPDATES;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.VALIDATE;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.aircraft;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.aton;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.dot;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.label;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.resources;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.sar;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.self_str;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.source;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.sourceRef;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.sources;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.timestamp;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.type;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.value;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.version;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.vessels;
+import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -290,7 +260,7 @@ public class Util {
 		if (body == null) 
 			return null;
 		String context = Util.getContext(path);
-		// if the path starts with config, sources, resources, then context = path
+		// if the path starts with config, sources, resources, logbook then context = path
 
 		path = context.equals(path)?path=null:path.substring(context.length() + 1, path.length());
 
@@ -415,6 +385,9 @@ public class Util {
 		}
 		
 		if (paths[0].equals(vessels)) {
+			return paths[0]+dot+paths[1];
+		}
+		if (paths[0].equals(logbook)) {
 			return paths[0]+dot+paths[1];
 		}
 		if (paths[0].equals(LIST)&&paths[1].equals(vessels)) {
