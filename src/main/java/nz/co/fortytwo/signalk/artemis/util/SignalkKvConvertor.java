@@ -193,7 +193,7 @@ public class SignalkKvConvertor {
 		if (post == null || post.isNull() || !post.has(PATH))
 			return;
 
-		if (!Util.checkPostValid(ctx)) {
+		if (!Util.checkPostValid(ctx )) {
 			String correlation = origMessage.getStringProperty(Config.AMQ_CORR_ID);
 			String destination = origMessage.getStringProperty(Config.AMQ_REPLY_Q);
 			Json err = sender.error(sender.getRequestId(post), "COMPLETED", 403,

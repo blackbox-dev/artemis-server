@@ -409,8 +409,6 @@ public final class ArtemisServer {
 	}
 
 	private void startKvHandlers() throws Exception {
-		handlerList.add(new LogbookAutoHandler());
-		handlerList.add(new LogbookEventHandler());
 		handlerList.add(new InfluxDbHandler());
 		handlerList.add(new TrueWindHandler());
 		handlerList.add(new AnchorWatchHandler());
@@ -422,6 +420,8 @@ public final class ArtemisServer {
 		handlerList.add(new DeltaMsgHandler());
 		handlerList.add(new FullMsgHandler());
 		handlerList.add(new SubscribeMsgHandler());
+		handlerList.add(new LogbookAutoHandler());
+		handlerList.add(new LogbookEventHandler());
 		
 		for(BaseHandler base: handlerList) {
 			base.startConsumer();

@@ -59,15 +59,14 @@ public class SwaggerService {
             	.readAllResources(true)
             	.resourceClasses(
             		ImmutableSet.of(
-            				SignalkStreamService.class.getCanonicalName(),
+            				SignalkStreamService.class.getCanonicalName(), 
             				AppsService.class.getCanonicalName(),
             				AuthService.class.getCanonicalName(),
             				SignalkHistoryService.class.getCanonicalName(),
             				SignalkApiService.class.getCanonicalName(),
             				SignalkEndpointService.class.getCanonicalName(),
             				SignalkPlaybackService.class.getCanonicalName(),
-            				SignalkSnapshotService.class.getCanonicalName(),
-							LogbookApiService.class.getCanonicalName()
+            				SignalkSnapshotService.class.getCanonicalName()
             				))
             	.openAPI(new OpenAPI().info(info))
             	.scannerClass(JaxrsApplicationAndAnnotationScanner.class.getName());
