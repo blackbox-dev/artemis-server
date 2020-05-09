@@ -722,37 +722,38 @@ public class Util {
 	}
 
 	public static boolean checkPostValid(String path) {
-			if(StringUtils.equals(path,"resources.charts"))return true;
-			if(StringUtils.equals(path,"resources.routes"))return true;
-			if(StringUtils.equals(path,"resources.notes"))return true;
-			if(StringUtils.equals(path,"resources.regions"))return true;
-			if(StringUtils.equals(path,"resources.waypoints"))return true;
-			if(StringUtils.equals(path,"vessels"))return true;
-			if(StringUtils.startsWith(path, "vessels.")&& uuidMatch.matcher(path).find()) {
-				if(StringUtils.endsWith(path,"electrical.ac"))return true;
-				if(StringUtils.endsWith(path,"electrical.alternators"))return true;
-				if(StringUtils.endsWith(path,"electrical.batteries"))return true;
-				if(StringUtils.endsWith(path,"electrical.chargers"))return true;
-				if(StringUtils.endsWith(path,"electrical.inverters"))return true;
-				if(StringUtils.endsWith(path,"electrical.solar"))return true;
-				if(StringUtils.endsWith(path,"propulsion"))return true;
-				if(StringUtils.endsWith(path,"sails.inventory"))return true;
-				if(StringUtils.endsWith(path,"tanks.baitWell"))return true;
-				if(StringUtils.endsWith(path,"tanks.ballast"))return true;
-				if(StringUtils.endsWith(path,"tanks.blackWater"))return true;
-				if(StringUtils.endsWith(path,"tanks.freshWater"))return true;
-				if(StringUtils.endsWith(path,"tanks.fuel"))return true;
-				if(StringUtils.endsWith(path,"tanks.gas"))return true;
-				if(StringUtils.endsWith(path,"tanks.liveWell"))return true;
-				if(StringUtils.endsWith(path,"tanks.lubrication"))return true;
-				if(StringUtils.endsWith(path,"tanks.wasteWater"))return true;
-			}
-			if(StringUtils.equals(path,"aircraft"))return true;
-			if(StringUtils.equals(path,"aton"))return true;
-			if(StringUtils.equals(path,"sar"))return true;
-			
-			return false;
-		
+		if(StringUtils.equals(path,"logbook.auto"))return true;
+		if(StringUtils.equals(path,"logbook.event"))return true;
+		if(StringUtils.equals(path,"resources.charts"))return true;
+		if(StringUtils.equals(path,"resources.routes"))return true;
+		if(StringUtils.equals(path,"resources.notes"))return true;
+		if(StringUtils.equals(path,"resources.regions"))return true;
+		if(StringUtils.equals(path,"resources.waypoints"))return true;
+		if(StringUtils.equals(path,"vessels"))return true;
+		if(StringUtils.startsWith(path, "vessels.")&& uuidMatch.matcher(path).find()) {
+			if(StringUtils.endsWith(path,"electrical.ac"))return true;
+			if(StringUtils.endsWith(path,"electrical.alternators"))return true;
+			if(StringUtils.endsWith(path,"electrical.batteries"))return true;
+			if(StringUtils.endsWith(path,"electrical.chargers"))return true;
+			if(StringUtils.endsWith(path,"electrical.inverters"))return true;
+			if(StringUtils.endsWith(path,"electrical.solar"))return true;
+			if(StringUtils.endsWith(path,"propulsion"))return true;
+			if(StringUtils.endsWith(path,"sails.inventory"))return true;
+			if(StringUtils.endsWith(path,"tanks.baitWell"))return true;
+			if(StringUtils.endsWith(path,"tanks.ballast"))return true;
+			if(StringUtils.endsWith(path,"tanks.blackWater"))return true;
+			if(StringUtils.endsWith(path,"tanks.freshWater"))return true;
+			if(StringUtils.endsWith(path,"tanks.fuel"))return true;
+			if(StringUtils.endsWith(path,"tanks.gas"))return true;
+			if(StringUtils.endsWith(path,"tanks.liveWell"))return true;
+			if(StringUtils.endsWith(path,"tanks.lubrication"))return true;
+			if(StringUtils.endsWith(path,"tanks.wasteWater"))return true;
+		}
+		if(StringUtils.equals(path,"aircraft"))return true;
+		if(StringUtils.equals(path,"aton"))return true;
+		if(StringUtils.equals(path,"sar"))return true;
+
+		return false;
 	}
 	
 }
