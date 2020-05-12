@@ -39,7 +39,7 @@ public class LogbookApiService extends BaseApiService {
 	@Context
 	private HttpServletRequest request;
 
-	public LogbookApiService() throws Exception{
+	public LogbookApiService() {
 	}
 	@Override
 	protected void initSession(String tempQ) throws Exception {
@@ -54,7 +54,7 @@ public class LogbookApiService extends BaseApiService {
 	}
 
 	
-	@Operation(summary = "Logbook Event", description = " Creates a new logbook event"
+	@Operation(summary = "Logbook Event", description = " Creates a new logbook event. "
 			+ "Creates a uuid and attaches the posted object at the path/uuid/, then returns the uuid."
 			+ " This is a 'fire-and-forget' method, see PUT ")
 	@ApiResponses ({
@@ -70,7 +70,7 @@ public class LogbookApiService extends BaseApiService {
 	    })
 	@Consumes(MediaType.APPLICATION_JSON)
 	@POST
-	@Path( "event")
+	@Path("event")
 	public String postAt(@Parameter(in = ParameterIn.COOKIE, name = SK_TOKEN) @CookieParam(SK_TOKEN) Cookie cookie,
 			@Parameter( name="body", 
 				description = "A signalk message",
