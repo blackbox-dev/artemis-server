@@ -149,7 +149,7 @@ public class SignalkKvConvertor {
 	}
 
 	protected static void parseUpdate(MessageSupport sender, Message origMessage, Json update, String ctx)
-			throws ActiveMQException {
+			throws Exception {
 
 		// grab values and add
 		Json array = update.at(values);
@@ -181,6 +181,10 @@ public class SignalkKvConvertor {
 			if (e.has(value)) {
 				if (logger.isDebugEnabled())
 					logger.debug("map.put: {}:{}", ctx + key, e);
+
+				// TODO: for testing security token added: normally should have logged in with admin???
+				String token = SecurityUtils.authenticateUser("admin", "admin");
+				origMessage.putStringProperty(Config.AMQ_USER_ROLES, SecurityUtils.getRoles(token).toString());
 				sender.sendKvMessage(origMessage, ctx + key + dot + values + dot + srcRef, e);
 			}
 		}

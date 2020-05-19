@@ -422,6 +422,7 @@ public final class ArtemisServer {
 		handlerList.add(new SubscribeMsgHandler());
 		handlerList.add(new LogbookAutoHandler());
 		handlerList.add(new LogbookEventHandler());
+		handlerList.add(new TimerHandler());
 		
 		for(BaseHandler base: handlerList) {
 			base.startConsumer();
