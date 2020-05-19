@@ -190,6 +190,7 @@ public class SignalKConstants {
 	public static final String logbook="logbook";
 	public static final String event="event";
 	public static final String auto="auto";
+	public static final String timer="timer";
 
 
 	//temp
