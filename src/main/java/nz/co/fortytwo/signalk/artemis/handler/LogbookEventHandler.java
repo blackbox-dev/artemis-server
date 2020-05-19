@@ -33,9 +33,13 @@ public class LogbookEventHandler extends BaseHandler {
 		if (logger.isDebugEnabled())
 			logger.debug("Initialising for : {} ", uuid);
 		try {
-			initSession(AMQ_INFLUX_KEY+" LIKE '"+logbook+dot+event+"%'");
+			initSession(
+					AMQ_INFLUX_KEY + " LIKE '" + logbook + dot + event + "%' OR "
+					+ AMQ_INFLUX_KEY + " LIKE '" + notifications + "%'"
+			);
+
 			logbookInfluxDB = new LogbookDbService(); // initialize logbook database service
-			logbookEvent = LogbookEvents.NULL; // initialize logbook event
+			logbookEvent = LogbookEvents.NULL; // initialize logbook event to NULL
 		} catch (Exception e) {
 			logger.error(e, e);
 		}
@@ -58,6 +62,7 @@ public class LogbookEventHandler extends BaseHandler {
 		// match message to appropriate event
 		//logbookEvent = node.getEvent(); // something similar to extract event type from message
 		//String event = node.at("value").asString();
+		// TODO: capture timestamp from message and also send to logbookInfluxDB??
 		logbookEvent = LogbookEvents.MOB;
 		logbookInfluxDB.saveToLogbook(logbookEvent.toString());
 		return;

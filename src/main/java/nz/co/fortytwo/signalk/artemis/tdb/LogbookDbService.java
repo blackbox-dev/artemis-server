@@ -6,7 +6,6 @@ import org.influxdb.InfluxDBException;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
 
-import java.util.Map;
 import java.util.NavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
@@ -24,13 +23,12 @@ public class LogbookDbService {
         } catch(InfluxDBException e) {
             System.out.println("Failed to connect to influx: " + e);
         }
-        // successfully connection. Save event to logbookDB
+        // successfully connected; save event to logbookDB
         logbookInfluxDB.setDatabase("logbook");
     }
 
 
     public void saveToLogbook(String eventType) {
-        String StW = "null";
         // Get necessary information from vessels measurement
         String query = "select * from vessels group by skey, primary, uuid, sourceRef order by time desc limit 1";
         NavigableMap<String, Json> map = new ConcurrentSkipListMap<>();
