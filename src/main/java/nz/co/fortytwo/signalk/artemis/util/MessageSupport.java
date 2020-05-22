@@ -168,6 +168,7 @@ public class MessageSupport {
 		if (logger.isDebugEnabled())
 			logger.debug("Msg body signalk.kv: {} = {}", k, j.toString());
 
+		//getProducer().send(INCOMING_RAW, txMsg);
 		getProducer().send(INTERNAL_KV, txMsg);
 
 	}
@@ -207,6 +208,17 @@ public class MessageSupport {
 		}
 		return producer.get();
 
+	}
+
+	protected ClientMessage initClientMessage() throws Exception {
+		ClientMessage txMsg = null;
+		txMsg = getTxSession().createMessage(true);
+		txMsg.putStringProperty(Config.MSG_SRC_BUS, "self.internal");
+		txMsg.putStringProperty(Config.MSG_SRC_TYPE, Config.MSG_SRC_TYPE_SERIAL);
+		txMsg.putStringProperty(Config.AMQ_CONTENT_TYPE, Config.AMQ_CONTENT_TYPE_JSON);
+		String token = SecurityUtils.authenticateUser("admin", "admin");
+		txMsg.putStringProperty(Config.AMQ_USER_ROLES, SecurityUtils.getRoles(token).toString());
+		return txMsg;
 	}
 
 	public void stop() {
