@@ -1,11 +1,15 @@
 package nz.co.fortytwo.signalk.artemis.tdb;
 
 import mjson.Json;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.influxdb.BatchOptions;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBException;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
 
+import java.text.DecimalFormat;
 import java.util.NavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
@@ -15,18 +19,24 @@ public class LogbookDbService {
 
     private InfluxDB logbookInfluxDB;
     private InfluxDbService artemisInfluxDB;
+    private static Logger logger = LogManager.getLogger(LogbookDbService.class);
+    private String dbName = "logbook";
 
     public LogbookDbService() {
         try {
             this.logbookInfluxDB = InfluxDBFactory.connect("http://localhost:8086", "admin", "admin");
+            // also create an artemisInfluxDB instance in order to query the 'vessels' database
             artemisInfluxDB = new InfluxDbService();
         } catch(InfluxDBException e) {
-            System.out.println("Failed to connect to influx: " + e);
+            logger.error("Failed to connect to influx: ", e);
         }
-        // successfully connected; save event to logbookDB
-        logbookInfluxDB.setDatabase("logbook");
+        // connection successful; set database to logbook
+        logbookInfluxDB.setDatabase(dbName);
+        // enable batch writes to get better performance
+        logbookInfluxDB.enableBatch(BatchOptions.DEFAULTS);
+        // retention policy states how long influx should store the data before deleting it
+        logbookInfluxDB.setRetentionPolicy("autogen");
     }
-
 
     public void saveToLogbook(String eventType) {
         // Get necessary information from vessels measurement
@@ -34,39 +44,42 @@ public class LogbookDbService {
         NavigableMap<String, Json> map = new ConcurrentSkipListMap<>();
         artemisInfluxDB.loadData(map, query);
 
-        /*for(Map.Entry<String, Json> entry : map.entrySet()) {
-            System.out.println("key: " + entry.getKey() + "\nvalue: " + entry.getValue() + "\n" + entry.getValue().at("value"));
-            if(entry.getKey().equals("vessels.urn:mrn:signalk:uuid:71c9c917-2d2c-495a-919d-17ab02411f6c.navigation.speedThroughWater")) {
-                System.out.println("FOUND KEY");
-                StW = entry.getValue().at("value").toString();
-            }
-        }*/
+        /*
+        * Important values are time, position, heading (navigation.headingMagnetic?), COG (true or magnetic?)
+        * STW, SOG, Depth, True wind speed(environment.wind.speetTrue), true wind direction
+        * water temperature, air temperature
+        * */
 
-        /*map.forEach((k, v) -> {
-            System.out.println("key: " + k + "value: " + "\n" + v.at("value"));
-            if(k.equals("vessels.urn:mrn:signalk:uuid:71c9c917-2d2c-495a-919d-17ab02411f6c.navigation.speedThroughWater")) {
-                System.out.println("FOUND KEY");
-                //StW = v.at("value").at("value").toString();
-            }
-        } );*/
-
-        String SoGValue = getValue(map, "navigation.speedOverGround");
-        String StWValue = getValue(map, "navigation.speedThroughWater");
         String[] posValues = getValue(map, "navigation.position").split(",");
+        String depth = getValue(map, "environment.depth.belowTransducer");
+        String windSpeed = getValue(map, "environment.wind.speedTrue");
+        String windDirection = getValue(map, "environment.wind.directionTrue");
+        String heading = getValue(map, "navigation.headingMagnetic");
+        String cog = getValue(map, "navigation.courseOverGroundTrue");
+        String stw = getValue(map, "navigation.speedThroughWater");
+        String sog = getValue(map, "navigation.speedOverGround");
+        String waterTemp = getValue(map, "environment.water.temperature");
         // create a measurement entry
         logbookInfluxDB.write(Point.measurement("event")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .addField("eventType", eventType)
                 .addField("posLat", posValues[0])
                 .addField("posLong", posValues[1])
-                .addField("SoG", SoGValue)
-                .addField("StW", StWValue)
+                .addField("depth", depth)
+                .addField("windSpeed", windSpeed)
+                .addField("windDirection", windDirection)
+                .addField("heading", heading)
+                .addField("cog", cog)
+                .addField("StW", stw)
+                .addField("SoG", sog)
+                .addField("waterTemp", waterTemp)
                 .build());
     }
 
     private String getValue(NavigableMap<String, Json> map, String keyDescription) {
+        DecimalFormat df = new DecimalFormat("#.00");
         String retVal = "null";
-        String strKey = map.keySet().stream().filter(s -> s.endsWith(keyDescription)).collect(Collectors.toSet()).toString();
+        String strKey = df.format(map.keySet().stream().filter(s -> s.endsWith(keyDescription)).collect(Collectors.toSet()).toString());
         if(strKey.contains("[")) {
             strKey = strKey.replace("[", "").trim();
         }

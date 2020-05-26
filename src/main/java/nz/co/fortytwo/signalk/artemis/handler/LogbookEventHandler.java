@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.NavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.TimeUnit;
 
 import static nz.co.fortytwo.signalk.artemis.util.Config.*;
 import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.*;
@@ -33,9 +34,10 @@ public class LogbookEventHandler extends BaseHandler {
 		if (logger.isDebugEnabled())
 			logger.debug("Initialising for : {} ", uuid);
 		try {
+
 			initSession(
 					AMQ_INFLUX_KEY + " LIKE '" + logbook + dot + event + "%' OR "
-					+ AMQ_INFLUX_KEY + " LIKE '" + notifications + "%'"
+					+ AMQ_INFLUX_KEY + " LIKE '%" + notifications + "%'"
 			);
 
 			logbookInfluxDB = new LogbookDbService(); // initialize logbook database service
@@ -48,24 +50,35 @@ public class LogbookEventHandler extends BaseHandler {
 	@Override
 	public void consume(Message message) {
 
-		// check if message is an event message.
-		//if (!AMQ_CONTENT_TYPE_EVENT_TRIGGERED.equals(message.getStringProperty(AMQ_CONTENT_TYPE)))
-		//	return;
 		if (!AMQ_CONTENT_TYPE_JSON_DELTA.equals(message.getStringProperty(AMQ_CONTENT_TYPE)))
 			return;
 
 		Json node = Util.readBodyBuffer( message.toCore());
 
-		// TODO: process message
-		//logger.info("got message -- " + node.asList());
-
-		// match message to appropriate event
-		//logbookEvent = node.getEvent(); // something similar to extract event type from message
-		//String event = node.at("value").asString();
-		// TODO: capture timestamp from message and also send to logbookInfluxDB??
-		logbookEvent = LogbookEvents.MOB;
-		logbookInfluxDB.saveToLogbook(logbookEvent.toString());
+		// retrieve event type from message
+		String eventTimestampArray[] = getEventAndTimestamp(node);
+		logbookInfluxDB.saveToLogbook(eventTimestampArray[0]);
 		return;
 	}
 
+	/**
+	 * Extract the eventType and timestamp from the message.
+	 * @Return The event type and timestamp as String[]
+	 * */
+	private String[] getEventAndTimestamp(Json node) {
+		String[] evenTimestampArray = new String[2];
+		// Differentiate between logbook event msg or vessels.notification
+		if (node.at("value").has("message")) {
+			// vessels.notification msg
+			evenTimestampArray[0] = node.at("value").at("message").getValue().toString();
+		} else {
+			// logbook event msg
+			String event = node.at("value").getValue().toString();
+			String e = event.split("=")[0].replace("{","").trim();
+			evenTimestampArray[0] = e;
+		}
+		evenTimestampArray[1] = node.at("timestamp").getValue().toString();
+		//long epoch = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(timestamp).getTime() / 1000
+		return evenTimestampArray;
+	}
 }
