@@ -59,7 +59,6 @@ public class LogbookApiService extends BaseApiService {
 		}
 	}
 
-	
 	@Operation(summary = "Logbook Event", description = " Creates a new logbook event. "
 			+ "Creates a uuid and attaches the posted object at the path/uuid/, then returns the uuid."
 			+ " This is a 'fire-and-forget' method, see PUT ")
@@ -104,10 +103,7 @@ public class LogbookApiService extends BaseApiService {
 		//String path = req.getPathInfo();
 		if (logger.isDebugEnabled())
 			logger.debug("get :{} ","self");
-		System.out.println("in /logbook/event/getMeasurements");
 		List<QueryResult.Series> queryResult = logbookDbService.getMeasurements();
 		return queryResult;
 	}
-
-
 }

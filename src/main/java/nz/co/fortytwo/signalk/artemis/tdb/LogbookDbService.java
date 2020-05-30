@@ -52,7 +52,6 @@ public class LogbookDbService {
         * STW, SOG, Depth, True wind speed(environment.wind.speetTrue), true wind direction
         * water temperature, air temperature
         * */
-
         String[] posValues = getValue(map, "navigation.position").split(",");
         String depth = getValue(map, "environment.depth.belowTransducer");
         String windSpeed = getValue(map, "environment.wind.speedTrue");
@@ -110,11 +109,8 @@ public class LogbookDbService {
     public void closeLogbookService() { logbookInfluxDB.close();}
 
     public List<QueryResult.Series> getMeasurements() {
-        System.out.println("logbookDbService.getMeasurements");
         String query = "select * from event";
-        List<QueryResult.Series> queryResult = logbookInfluxDB.query(new Query(query)).getResults().get(0).getSeries();
-        System.out.println("queryResult: \n" + queryResult);
-        //NavigableMap<String, Json> map = new ConcurrentSkipListMap<>();
-        return queryResult;
+        //List<QueryResult.Series> queryResult =
+        return logbookInfluxDB.query(new Query(query)).getResults().get(0).getSeries();
     }
 }
