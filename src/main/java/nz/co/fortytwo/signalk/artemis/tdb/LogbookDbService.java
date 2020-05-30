@@ -8,8 +8,11 @@ import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBException;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
+import org.influxdb.dto.Query;
+import org.influxdb.dto.QueryResult;
 
 import java.text.DecimalFormat;
+import java.util.List;
 import java.util.NavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
@@ -79,7 +82,8 @@ public class LogbookDbService {
     private String getValue(NavigableMap<String, Json> map, String keyDescription) {
         DecimalFormat df = new DecimalFormat("#.00");
         String retVal = "null";
-        String strKey = df.format(map.keySet().stream().filter(s -> s.endsWith(keyDescription)).collect(Collectors.toSet()).toString());
+        //String strKey = df.format(map.keySet().stream().filter(s -> s.endsWith(keyDescription)).collect(Collectors.toSet()).toString());
+        String strKey = map.keySet().stream().filter(s -> s.endsWith(keyDescription)).collect(Collectors.toSet()).toString();
         if(strKey.contains("[")) {
             strKey = strKey.replace("[", "").trim();
         }
@@ -104,4 +108,13 @@ public class LogbookDbService {
      * Closes the logbookInfluxDB resource, thus setting underlying resources free.
      */
     public void closeLogbookService() { logbookInfluxDB.close();}
+
+    public List<QueryResult.Series> getMeasurements() {
+        System.out.println("logbookDbService.getMeasurements");
+        String query = "select * from event";
+        List<QueryResult.Series> queryResult = logbookInfluxDB.query(new Query(query)).getResults().get(0).getSeries();
+        System.out.println("queryResult: \n" + queryResult);
+        //NavigableMap<String, Json> map = new ConcurrentSkipListMap<>();
+        return queryResult;
+    }
 }

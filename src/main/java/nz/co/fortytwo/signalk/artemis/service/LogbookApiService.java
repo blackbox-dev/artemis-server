@@ -9,18 +9,21 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import mjson.Json;
+import nz.co.fortytwo.signalk.artemis.tdb.LogbookDbService;
 import nz.co.fortytwo.signalk.artemis.util.Util;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.atmosphere.client.TrackMessageSizeInterceptor;
 import org.atmosphere.config.service.AtmosphereService;
 import org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor;
+import org.influxdb.dto.QueryResult;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 import java.util.UUID;
 
 import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.SK_TOKEN;
@@ -35,12 +38,15 @@ import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.SK_TOKEN;
 public class LogbookApiService extends BaseApiService {
 
 	private static Logger logger = LogManager.getLogger(LogbookApiService.class);
+	private LogbookDbService logbookDbService;
 
 	@Context
 	private HttpServletRequest request;
 
 	public LogbookApiService() {
+		this.logbookDbService = new LogbookDbService();
 	}
+
 	@Override
 	protected void initSession(String tempQ) throws Exception {
 		try{
@@ -76,10 +82,8 @@ public class LogbookApiService extends BaseApiService {
 				description = "A signalk message",
 				schema = @Schema(
 						example = "{\n" + 
-								"  \"value\": {\n" + 
-								"      \"grounding\":{\n" +
-								"        \"title\":\"My Note\",\n" +
-								"        \"description\":\"My note description\"" +
+								"  \"value\": {\n" +
+								"      \"message\": \"MOB\" \n" +
 								"  		}\n" +
 								"  }\n" +
 								"}")) String body) throws Exception {
@@ -92,4 +96,18 @@ public class LogbookApiService extends BaseApiService {
 			getResource(request).suspend();
 			return "";
 	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("event/getMeasurements")
+	public List<QueryResult.Series> getMeasurements() throws Exception {
+		//String path = req.getPathInfo();
+		if (logger.isDebugEnabled())
+			logger.debug("get :{} ","self");
+		System.out.println("in /logbook/event/getMeasurements");
+		List<QueryResult.Series> queryResult = logbookDbService.getMeasurements();
+		return queryResult;
+	}
+
+
 }
