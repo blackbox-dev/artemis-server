@@ -7,6 +7,7 @@ import org.apache.activemq.artemis.api.core.Message;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.util.NavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 

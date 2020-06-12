@@ -11,6 +11,12 @@ import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.NavigableMap;
@@ -65,8 +71,8 @@ public class LogbookDbService {
         logbookInfluxDB.write(Point.measurement("event")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .addField("eventType", eventType)
-                .addField("posLat", posValues[0])
-                .addField("posLong", posValues[1])
+                .addField("posLat", posValues[0].trim())
+                .addField("posLong", posValues[1].trim())
                 .addField("depth", depth)
                 .addField("windSpeed", windSpeed)
                 .addField("windDirection", windDirection)
@@ -76,6 +82,18 @@ public class LogbookDbService {
                 .addField("SoG", sog)
                 .addField("waterTemp", waterTemp)
                 .build());
+
+        // send curl post request to telegraf
+        try {
+            String line_protocol = String.format("event,eventType=%s posLat=%s,posLong=%s,depth=%s,windSpeed=%s,windDirection=%s,heading=%s,cog=%s,stw=%s,SoG=%s,waterTemp=%s",
+                    eventType, posValues[0].trim(), posValues[1].trim(), depth, windSpeed, windDirection, heading, cog, stw, sog, waterTemp);
+            System.out.println("line_protocol: " + line_protocol);
+            String[] command = {"/bin/sh", "-c", "curl -i -XPOST 'http://localhost:8186/write' --data-binary '" + line_protocol + "'"};
+            Process p = Runtime.getRuntime().exec(command);
+            p.destroy();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
     private String getValue(NavigableMap<String, Json> map, String keyDescription) {
