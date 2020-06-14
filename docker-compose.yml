@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   influxdb:
-    image: blackbox:influxdb
+    image: davidkuba/blackbox:influxdb
     container_name: influxdb
     ports:
       - 8086:8086
@@ -11,7 +11,7 @@ services:
     command: influxd
     network_mode: host
   signalk:
-    image: blackbox:signalk
+    image: davidkuba/blackbox:signalk
     container_name: signalk
     volumes:
       - ./:/etc/signalkJavaServer:Z
