@@ -23,8 +23,10 @@ sudo chmod +x /usr/local/bin/docker-compose
 git clone https://github.com/blackbox-dev/artemis-server.git
 cd /artemis-server
 sudo git checkout dockerBuild
+sudo mvn package -Dmaven.test.skip=true
+sudo chmod 777 docker/signalk/signalk_entrypoint.sh
 
-sudo docker pull davidkuba/blackbox:signalk
-sudo docker pull davidkuba/blackbox:influxdb
+sudo docker build --tag blackbox:signalk -f docker/signalk/Dockerfile .
+sudo docker build --tag blackbox:influxdb -f docker/influxdb/Dockerfile .
 
 sudo docker-compose up
