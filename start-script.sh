@@ -21,10 +21,10 @@ sudo curl -L "https://github.com/docker/compose/releases/download/1.23.1/docker-
 sudo chmod +x /usr/local/bin/docker-compose
 
 git clone https://github.com/blackbox-dev/artemis-server.git
-cd /artemis-server
 sudo git checkout dockerBuild
 
 sudo docker pull davidkuba/blackbox:signalk
 sudo docker pull davidkuba/blackbox:influxdb
 
+cd /artemis-server
 sudo docker-compose up
