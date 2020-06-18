@@ -26,7 +26,7 @@ services:
     depends_on:
       - influxdb
     network_mode: host
-	restart: always
+    restart: always
   telegraf:
      image: telegraf
      container_name: telegraf
