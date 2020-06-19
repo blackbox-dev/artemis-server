@@ -1,0 +1,47 @@
+version: '3.3'
+services:
+  influxdb:
+    image: blackbox:influxdb
+    container_name: influxdb
+    ports:
+      - 8086:8086
+      - 8088:8088
+    volumes:
+      - /var/lib/influxdb:/var/lib/influxdb:Z
+    command: influxd
+    network_mode: host
+  signalk:
+    image: blackbox:signalk
+    container_name: signalk
+    volumes:
+      - ./:/etc/signalkJavaServer:Z
+    ports:
+      - 80:80
+      - 443:443
+      - 3000:3000
+      - 8888:8888
+      - 8443:8443     # http
+      - 55555:55555   # tcp
+      - 55557:55557   # udp
+    depends_on:
+      - influxdb
+    network_mode: host
+    restart: always
+  telegraf:
+     image: telegraf
+     container_name: telegraf
+     hostname: localhost
+     environment:
+       INFLUXDB_URL: http://influxdb:8086
+       HOST_PROC: /rootfs/proc
+       HOST_SYS: /rootfs/sys
+       HOST_ETC: /rootfs/etc
+     depends_on:
+       - influxdb
+     volumes:
+       - /etc/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+       - /var/run/docker.sock:/var/run/docker.sock:ro
+       - /sys:/rootfs/sys:ro
+       - /proc:/rootfs/proc:ro
+       - /etc:/rootfs/etc:ro
+     network_mode: host
