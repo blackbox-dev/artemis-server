@@ -90,7 +90,8 @@ public class LogbookDbService {
             System.out.println("line_protocol: " + line_protocol);
             String[] command = {"/bin/sh", "-c", "curl -i -XPOST 'http://localhost:8186/write' --data-binary '" + line_protocol + "'"};
             Process p = Runtime.getRuntime().exec(command);
-            p.destroy();
+            //s
+            // p.destroy();
         } catch (Exception e) {
             System.out.println(e);
         }
