@@ -1,5 +1,9 @@
 package nz.co.fortytwo.signalk.artemis.service;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -15,8 +19,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.atmosphere.client.TrackMessageSizeInterceptor;
 import org.atmosphere.config.service.AtmosphereService;
+import org.atmosphere.config.service.Get;
 import org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor;
 import org.influxdb.dto.QueryResult;
+
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -82,7 +88,8 @@ public class LogbookApiService extends BaseApiService {
 				schema = @Schema(
 						example = "{\n" + 
 								"  \"value\": {\n" +
-								"      \"message\": \"MOB\" \n" +
+								"      \"message\": \"MOB\", \n" +
+								"      \"timestamp\": \"1592172537067000000\" \n" +
 								"  		}\n" +
 								"  }\n" +
 								"}")) String body) throws Exception {
@@ -93,13 +100,45 @@ public class LogbookApiService extends BaseApiService {
 			Json msg = Util.getJsonPostRequest(sanitizeApiPath(logbookPath),Json.read(body));
 			sendMessage(getTempQ(),addToken(msg, cookie),null,getToken(cookie));
 			getResource(request).suspend();
-			return "";
+			return "Ok";
 	}
 
+	@Operation(summary = "Request logbook data from \'start date\' to \'end date\'",
+			description = "Returns the logbook measurements found within the interval \'from\' \'until\'.")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("event/getMeasurements")
 	public List<QueryResult.Series> getMeasurements() throws Exception {
+		//String path = req.getPathInfo();
+		if (logger.isDebugEnabled())
+			logger.debug("get :{} ","self");
+		List<QueryResult.Series> queryResult = logbookDbService.getMeasurements();
+		JsonObject measurements = createJsonObject(queryResult);
+		System.out.println("measurements: \n" + measurements.toString());
+		return queryResult;
+	}
+
+	private JsonObject createJsonObject(List<QueryResult.Series> queryResult) {
+		JsonArray measurementsArray = new JsonArray();
+		// for all points within QueryResult
+		JsonObject measurements = new JsonObject();
+		JsonObject m1 = new JsonObject();
+		m1.addProperty("eventType", "MOB");
+		JsonObject m2 = new JsonObject();
+		m2.addProperty("eventType", "FIRE");
+		measurements.add("1", m1);
+		measurements.add("2", m2);
+		measurementsArray.add(measurements);
+		System.out.println("JsonArray: \n" + measurementsArray);
+		return measurements;
+	}
+
+	@Operation(summary = "Request logbook data from date until date",
+			description = "Returns the logbook measurements found within the interval \'from\' \'until\'.")
+	@Get
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("{path:[^?]*}")
+	public List<QueryResult.Series> getMeasurementsFromTo() throws Exception {
 		//String path = req.getPathInfo();
 		if (logger.isDebugEnabled())
 			logger.debug("get :{} ","self");

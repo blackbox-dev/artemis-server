@@ -28,7 +28,7 @@ public class LogbookAutoHandler extends BaseHandler {
 
 	@Override
 	public void consume(Message message) {
-		logbookInfluxDB.saveToLogbook("auto");
+		logbookInfluxDB.saveToLogbook("auto", System.currentTimeMillis() + "" );
 	}
 
 }

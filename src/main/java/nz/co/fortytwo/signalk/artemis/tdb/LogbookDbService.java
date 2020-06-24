@@ -10,13 +10,6 @@ import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.NavigableMap;
@@ -30,10 +23,11 @@ public class LogbookDbService {
     private InfluxDbService artemisInfluxDB;
     private static Logger logger = LogManager.getLogger(LogbookDbService.class);
     private String dbName = "logbook";
+    private String dbURL = "http://localhost:8086";
 
     public LogbookDbService() {
         try {
-            this.logbookInfluxDB = InfluxDBFactory.connect("http://localhost:8086", "admin", "admin");
+            this.logbookInfluxDB = InfluxDBFactory.connect(dbURL, "admin", "admin");
             // also create an artemisInfluxDB instance in order to query the 'vessels' database
             artemisInfluxDB = new InfluxDbService();
         } catch(InfluxDBException e) {
@@ -47,16 +41,30 @@ public class LogbookDbService {
         logbookInfluxDB.setRetentionPolicy("autogen");
     }
 
-    public void saveToLogbook(String eventType) {
+    public void saveToLogbook(String eventType, String timestamp) {
         // Get necessary information from vessels measurement
         String query = "select * from vessels group by skey, primary, uuid, sourceRef order by time desc limit 1";
         NavigableMap<String, Json> map = new ConcurrentSkipListMap<>();
         artemisInfluxDB.loadData(map, query);
 
         /*
-        * Important values are time, position, heading (navigation.headingMagnetic?), COG (true or magnetic?)
-        * STW, SOG, Depth, True wind speed(environment.wind.speetTrue), true wind direction
-        * water temperature, air temperature
+        * Important values are
+        * navigation:
+        *   * position (lon, lat)
+        *   * heading (navigation.headingMagnetic?),
+        *   * STW (kn)
+        *   * SOG (kn)
+        *   * COG (true or magnetic?) (deg)
+        * environment
+        *   * depth (m)
+        *   * wind
+        *     * AWS (kn)
+        *     * AWA (deg)
+        *     * TWS (kn) environment.wind.speetTrue
+        *     * TWA (deg)
+        *     * true wind direction
+        *   * water temperature
+        *   * air temperature
         * */
         String[] posValues = getValue(map, "navigation.position").split(",");
         String depth = getValue(map, "environment.depth.belowTransducer");
@@ -69,7 +77,9 @@ public class LogbookDbService {
         String waterTemp = getValue(map, "environment.water.temperature");
         // create a measurement entry
         logbookInfluxDB.write(Point.measurement("event")
-                .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                //.time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                .time(Long.parseLong(timestamp), TimeUnit.NANOSECONDS)
+                //.tag("eventType", eventType)
                 .addField("eventType", eventType)
                 .addField("posLat", posValues[0].trim())
                 .addField("posLong", posValues[1].trim())

@@ -46,7 +46,7 @@ public class LogbookEventHandler extends BaseHandler {
 
 		// retrieve event type from message
 		String eventTimestampArray[] = getEventAndTimestamp(node);
-		logbookInfluxDB.saveToLogbook(eventTimestampArray[0]);
+		logbookInfluxDB.saveToLogbook(eventTimestampArray[0], eventTimestampArray[1]);
 		return;
 	}
 
@@ -55,8 +55,9 @@ public class LogbookEventHandler extends BaseHandler {
 	 * @Return The event type and timestamp as String[]
 	 * */
 	private String[] getEventAndTimestamp(Json node) {
-		String[] evenTimestampArray = new String[2];
-		evenTimestampArray[0] = node.at("value").at("message").getValue().toString();
+		String[] eventTimestampArray = new String[3];
+		eventTimestampArray[0] = node.at("value").at("message").getValue().toString();
+		eventTimestampArray[1] = node.at("value").at("timestamp").getValue().toString();
 		// Differentiate between logbook event msg or vessels.notification
 		/*if (node.at("value").has("message")) {
 			// vessels.notification msg
@@ -67,8 +68,8 @@ public class LogbookEventHandler extends BaseHandler {
 			String e = event.split("=")[0].replace("{","").trim();
 			evenTimestampArray[0] = e;
 		}*/
-		evenTimestampArray[1] = node.at("timestamp").getValue().toString();
+		eventTimestampArray[2] = node.at("timestamp").getValue().toString();
 		//long epoch = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(timestamp).getTime() / 1000
-		return evenTimestampArray;
+		return eventTimestampArray;
 	}
 }
