@@ -137,8 +137,8 @@ public class LogbookDbService {
      */
     public void closeLogbookService() { logbookInfluxDB.close();}
 
-    public List<QueryResult.Series> getMeasurements() {
-        String query = "select * from event";
+    public List<QueryResult.Series> getMeasurements(String query) {
+        //String query = "select * from event";
         //List<QueryResult.Series> queryResult =
         return logbookInfluxDB.query(new Query(query)).getResults().get(0).getSeries();
     }
