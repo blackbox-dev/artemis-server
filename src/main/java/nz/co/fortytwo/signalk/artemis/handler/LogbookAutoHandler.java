@@ -19,8 +19,8 @@ public class LogbookAutoHandler extends BaseHandler {
 			logger.debug("Initialising for : {} ", uuid);
 		try {
 			initSession(AMQ_INFLUX_KEY + " LIKE '%" + logbook + dot + auto + "%'");
-					//+ AMQ_INFLUX_KEY + " LIKE '" + vessels + "%'");
 			logbookInfluxDB = new LogbookDbService();
+
 		} catch (Exception e) {
 			logger.error(e, e);
 		}
@@ -28,7 +28,8 @@ public class LogbookAutoHandler extends BaseHandler {
 
 	@Override
 	public void consume(Message message) {
-		logbookInfluxDB.saveToLogbook("auto", System.currentTimeMillis() + "" );
+		logbookInfluxDB.saveToLogbook("auto", System.currentTimeMillis()+"");
 	}
+
 
 }
