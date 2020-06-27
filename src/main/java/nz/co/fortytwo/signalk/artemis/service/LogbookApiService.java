@@ -100,7 +100,7 @@ public class LogbookApiService extends BaseApiService {
 			return "Ok";
 	}
 
-	@Operation(summary = "Request all logbook measurements",
+	/*@Operation(summary = "Request all logbook measurements",
 			description = "Returns all the measurements within the logbook database.")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -114,7 +114,7 @@ public class LogbookApiService extends BaseApiService {
 		System.out.println("queryResult: " + queryResult);
 		JsonArray measurements = createJsonObject(queryResult);
 		return measurements.toString();
-	}
+	}*/
 
 	private JsonArray createJsonObject(List<QueryResult.Series> queryResult) {
 		JsonArray measurementsArray = new JsonArray();
@@ -217,7 +217,7 @@ public class LogbookApiService extends BaseApiService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@GET
 	//@Path("/event/getMeasurements/{path:[^?]*}")
-	@Path("/event/getMeasurementss/")
+	@Path("/event/getMeasurements/")
 	public String getHistory(@Parameter(in = ParameterIn.COOKIE, name = SK_TOKEN) @CookieParam(SK_TOKEN) Cookie cookie,
 							 @Parameter( description = "An ISO 8601 format date/time string", example="2020-06-01T00:00:00.067Z" ) @QueryParam("fromTime")String fromTime,
 							 @Parameter( description = "An ISO 8601 format date/time string", example="2020-06-26T17:26:25.407Z") @QueryParam("toTime")String toTime) throws Exception
