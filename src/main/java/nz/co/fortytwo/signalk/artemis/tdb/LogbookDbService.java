@@ -11,6 +11,7 @@ import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
 import java.text.DecimalFormat;
+import java.time.Instant;
 import java.util.List;
 import java.util.NavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -76,9 +77,15 @@ public class LogbookDbService {
         String sog = getValue(map, "navigation.speedOverGround");
         String waterTemp = getValue(map, "environment.water.temperature");
         // create a measurement entry
+        String test = "1592172537468000000";
+        long nano = Instant.parse(timestamp).toEpochMilli();
+        String nanoToString = nano + "000000";
+        System.out.println("####\n" + nano + "\n####\n");
+        System.out.println("~~~~\n" + nanoToString + "\n~~~~\n");
         logbookInfluxDB.write(Point.measurement("event")
                 //.time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-                .time(Long.parseLong(timestamp), TimeUnit.NANOSECONDS)
+                //.time(Long.parseLong(nano), TimeUnit.NANOSECONDS)
+                .time(Long.parseLong(nanoToString), TimeUnit.NANOSECONDS)
                 //.tag("eventType", eventType)
                 .addField("eventType", eventType)
                 .addField("posLat", posValues[0].trim())
