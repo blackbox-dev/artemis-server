@@ -86,7 +86,7 @@ public class LogbookApiService extends BaseApiService {
 						example = "{\n" + 
 								"  \"value\": {\n" +
 								"      \"message\": \"MOB\", \n" +
-								"      \"timestamp\": \"1592172537067000000\" \n" +
+								"      \"timestamp\": \"2020-06-27T19:01:13.252Z\" \n" +
 								"  		}\n" +
 								"  }\n" +
 								"}")) String body) throws Exception {
