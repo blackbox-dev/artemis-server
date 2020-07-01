@@ -1,6 +1,7 @@
 package nz.co.fortytwo.signalk.artemis.handler;
 
 import nz.co.fortytwo.signalk.artemis.tdb.LogbookDbService;
+import nz.co.fortytwo.signalk.artemis.util.Util;
 import org.apache.activemq.artemis.api.core.Message;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,7 +29,8 @@ public class LogbookAutoHandler extends BaseHandler {
 
 	@Override
 	public void consume(Message message) {
-		logbookInfluxDB.saveToLogbook("auto", System.currentTimeMillis()+"");
+		String t = Util.getIsoTimeString();
+		logbookInfluxDB.saveToLogbook("auto", t);
 	}
 
 
