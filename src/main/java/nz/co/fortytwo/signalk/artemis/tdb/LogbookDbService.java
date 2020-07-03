@@ -69,7 +69,10 @@ public class LogbookDbService {
         * */
         String[] posValues = getValue(map, "navigation.position").split(",");
         String depth = getValue(map, "environment.depth.belowTransducer");
-        String windSpeed = getValue(map, "environment.wind.speedTrue");
+        String aws = getValue(map, "environment.wind.speedApparent");
+        String awa = getValue(map, "environment.wind.angleApparent");
+        String tws = getValue(map, "environment.wind.speedTrue"); //tws
+        String twa = getValue(map, "environment.wind.angleTrueWater");
         String windDirection = getValue(map, "environment.wind.directionTrue");
         String heading = getValue(map, "navigation.headingMagnetic");
         String cog = getValue(map, "navigation.courseOverGroundTrue");
@@ -80,35 +83,33 @@ public class LogbookDbService {
         String test = "1592172537468000000";
         long nano = Instant.parse(timestamp).toEpochMilli();
         String nanoToString = nano + "000000";
-        System.out.println("####\n" + nano + "\n####\n");
-        System.out.println("~~~~\n" + nanoToString + "\n~~~~\n");
         logbookInfluxDB.write(Point.measurement("event")
                 //.time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 //.time(Long.parseLong(nano), TimeUnit.NANOSECONDS)
                 .time(Long.parseLong(nanoToString), TimeUnit.NANOSECONDS)
-                //.tag("eventType", eventType)
-                .addField("eventType", eventType)
+                .tag("type", eventType)
                 .addField("posLat", posValues[0].trim())
                 .addField("posLong", posValues[1].trim())
-                .addField("depth", depth)
-                .addField("windSpeed", windSpeed)
-                .addField("windDirection", windDirection)
                 .addField("heading", heading)
-                .addField("cog", cog)
-                .addField("StW", stw)
-                .addField("SoG", sog)
+                .addField("COG", cog)
+                .addField("STW", stw)
+                .addField("SOG", sog)
+                .addField("depth", depth)
+                .addField("AWS", aws)
+                .addField("AWA", awa)
+                .addField("TWS", tws)
+                .addField("TWA", twa)
+                .addField("windDirection", windDirection)
                 .addField("waterTemp", waterTemp)
                 .build());
 
         // send curl post request to telegraf
         try {
-            String line_protocol = String.format("event,eventType=%s posLat=%s,posLong=%s,depth=%s,windSpeed=%s,windDirection=%s,heading=%s,cog=%s,stw=%s,SoG=%s,waterTemp=%s",
-                    eventType, posValues[0].trim(), posValues[1].trim(), depth, windSpeed, windDirection, heading, cog, stw, sog, waterTemp);
+            String line_protocol = String.format("event,type=%s posLat=%s,posLong=%s,heading=%s,STW=%s,SOG=%s,COG=%s,depth=%s,AWS=%s,AWA=%s,TWS=%s,TWA=%s,windDirection=%s,waterTemp=%s %s",
+                    eventType, posValues[0].trim(), posValues[1].trim(), heading, stw, sog, cog, depth, aws, awa, tws, twa, windDirection, waterTemp, nanoToString);
             System.out.println("line_protocol: " + line_protocol);
             String[] command = {"/bin/sh", "-c", "curl -i -XPOST 'http://localhost:8186/write' --data-binary '" + line_protocol + "'"};
             Process p = Runtime.getRuntime().exec(command);
-            //s
-            // p.destroy();
         } catch (Exception e) {
             System.out.println(e);
         }

@@ -100,29 +100,10 @@ public class LogbookApiService extends BaseApiService {
 			return "Ok";
 	}
 
-	/*@Operation(summary = "Request all logbook measurements",
-			description = "Returns all the measurements within the logbook database.")
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("event/getMeasurements")
-	public String getMeasurements() {
-		String query = "SELECT * FROM event";
-		//String path = req.getPathInfo();
-		if (logger.isDebugEnabled())
-			logger.debug("get :{} ","self");
-		List<QueryResult.Series> queryResult = logbookDbService.getMeasurements(query);
-		System.out.println("queryResult: " + queryResult);
-		JsonArray measurements = createJsonObject(queryResult);
-		return measurements.toString();
-	}*/
-
 	private JsonArray createJsonObject(List<QueryResult.Series> queryResult) {
 		JsonArray measurementsArray = new JsonArray();
-		//JsonObject measurement = new JsonObject();
 		ArrayList<String> columns = (ArrayList<String>) queryResult.get(0).getColumns();
-		//System.out.println("columns: " + columns);
 		List<List<Object>> values = queryResult.get(0).getValues();
-		//System.out.println("values: " + values);
 		int i;
 		for(i = 0; i < values.size(); i++) {
 			List v = values.get(i);
@@ -130,7 +111,7 @@ public class LogbookApiService extends BaseApiService {
 			JsonObject measurement = new JsonObject();
 
 			measurement.addProperty("time", (String) v.get(columns.indexOf("time")));
-			measurement.addProperty("type", (String) v.get(columns.indexOf("eventType")));
+			measurement.addProperty("type", (String) v.get(columns.indexOf("type")));
 			// navigation object include position, stw, sog, cog, heading
 			JsonObject navigation = new JsonObject();
 			JsonObject long_lat = new JsonObject();
@@ -144,17 +125,17 @@ public class LogbookApiService extends BaseApiService {
 			navigation.add("heading", heading_value_unit);
 
 			JsonObject stw_value_unit = new JsonObject();
-			stw_value_unit.addProperty("value", (String) v.get(columns.indexOf("StW")));
+			stw_value_unit.addProperty("value", (String) v.get(columns.indexOf("STW")));
 			stw_value_unit.addProperty("unit", "m/s");
 			navigation.add("STW", stw_value_unit); // add STW to navigation object
 
 			JsonObject sog_value_unit = new JsonObject();
-			sog_value_unit.addProperty("value", (String) v.get(columns.indexOf("SoG")));
+			sog_value_unit.addProperty("value", (String) v.get(columns.indexOf("SOG")));
 			sog_value_unit.addProperty("unit", "m/s");
 			navigation.add("SOG", sog_value_unit); // add SOG to navigation object
 
 			JsonObject cog_value_unit = new JsonObject();
-			cog_value_unit.addProperty("value", (String) v.get(columns.indexOf("cog")));
+			cog_value_unit.addProperty("value", (String) v.get(columns.indexOf("COG")));
 			cog_value_unit.addProperty("unit", "rad");
 			navigation.add("COG", cog_value_unit); // add COG to navigation object
 
@@ -169,24 +150,29 @@ public class LogbookApiService extends BaseApiService {
 
 			JsonObject wind = new JsonObject();
 			JsonObject aws_value_unit = new JsonObject();
-			aws_value_unit.addProperty("value", (String) v.get(columns.indexOf("windSpeed")));
+			aws_value_unit.addProperty("value", (String) v.get(columns.indexOf("AWS")));
 			aws_value_unit.addProperty("unit", "m/s");
 			wind.add("AWS", aws_value_unit);
 
 			JsonObject awa_value_unit = new JsonObject();
-			awa_value_unit.addProperty("value", (String) v.get(columns.indexOf("windSpeed")));
+			awa_value_unit.addProperty("value", (String) v.get(columns.indexOf("AWA")));
 			awa_value_unit.addProperty("unit", "rad");
 			wind.add("AWA", awa_value_unit);
 
 			JsonObject tws_value_unit = new JsonObject();
-			tws_value_unit.addProperty("value", (String) v.get(columns.indexOf("windSpeed")));
+			tws_value_unit.addProperty("value", (String) v.get(columns.indexOf("TWS")));
 			tws_value_unit.addProperty("unit", "m/s");
 			wind.add("TWS", tws_value_unit);
 
 			JsonObject twa_value_unit = new JsonObject();
-			twa_value_unit.addProperty("value", (String) v.get(columns.indexOf("windSpeed")));
-			twa_value_unit.addProperty("unit", "m/s");
+			twa_value_unit.addProperty("value", (String) v.get(columns.indexOf("TWA")));
+			twa_value_unit.addProperty("unit", "rad");
 			wind.add("TWA", twa_value_unit);
+
+			JsonObject wind_direction_value_unit = new JsonObject();
+			wind_direction_value_unit.addProperty("value", (String) v.get(columns.indexOf("windDirection")));
+			wind_direction_value_unit.addProperty("unit", "m/s");
+			wind.add("windDirection", wind_direction_value_unit);
 
 			JsonObject water = new JsonObject();
 			JsonObject temp_value_unit = new JsonObject();
