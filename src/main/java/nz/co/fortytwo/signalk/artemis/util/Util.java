@@ -2,37 +2,7 @@ package nz.co.fortytwo.signalk.artemis.util;
 
 import static nz.co.fortytwo.signalk.artemis.util.Config.ADMIN_USER;
 import static nz.co.fortytwo.signalk.artemis.util.Config.AMQ_USER_TOKEN;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.ALL;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.CONFIG;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.GET;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.KNOTS_TO_MS;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.LIST;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.LOGIN;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.LOGOUT;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.MS_TO_KNOTS;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.PLAYBACK_RATE;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.POST;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.PUT;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.START_TIME;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.SUBSCRIBE;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.UNSUBSCRIBE;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.UPDATES;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.VALIDATE;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.aircraft;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.aton;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.dot;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.label;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.resources;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.sar;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.self_str;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.source;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.sourceRef;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.sources;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.timestamp;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.type;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.value;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.version;
-import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.vessels;
+import static nz.co.fortytwo.signalk.artemis.util.SignalKConstants.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -417,6 +387,11 @@ public class Util {
 		if (paths[0].equals(vessels)) {
 			return paths[0]+dot+paths[1];
 		}
+
+		if (paths[0].equals(logbook)) {
+			return paths[0]+dot+paths[1];
+		}
+
 		if (paths[0].equals(LIST)&&paths[1].equals(vessels)) {
 			if(paths.length>2) {
 				return paths[0]+dot+paths[1]+dot+paths[2];
@@ -722,37 +697,38 @@ public class Util {
 	}
 
 	public static boolean checkPostValid(String path) {
-			if(StringUtils.equals(path,"resources.charts"))return true;
-			if(StringUtils.equals(path,"resources.routes"))return true;
-			if(StringUtils.equals(path,"resources.notes"))return true;
-			if(StringUtils.equals(path,"resources.regions"))return true;
-			if(StringUtils.equals(path,"resources.waypoints"))return true;
-			if(StringUtils.equals(path,"vessels"))return true;
-			if(StringUtils.startsWith(path, "vessels.")&& uuidMatch.matcher(path).find()) {
-				if(StringUtils.endsWith(path,"electrical.ac"))return true;
-				if(StringUtils.endsWith(path,"electrical.alternators"))return true;
-				if(StringUtils.endsWith(path,"electrical.batteries"))return true;
-				if(StringUtils.endsWith(path,"electrical.chargers"))return true;
-				if(StringUtils.endsWith(path,"electrical.inverters"))return true;
-				if(StringUtils.endsWith(path,"electrical.solar"))return true;
-				if(StringUtils.endsWith(path,"propulsion"))return true;
-				if(StringUtils.endsWith(path,"sails.inventory"))return true;
-				if(StringUtils.endsWith(path,"tanks.baitWell"))return true;
-				if(StringUtils.endsWith(path,"tanks.ballast"))return true;
-				if(StringUtils.endsWith(path,"tanks.blackWater"))return true;
-				if(StringUtils.endsWith(path,"tanks.freshWater"))return true;
-				if(StringUtils.endsWith(path,"tanks.fuel"))return true;
-				if(StringUtils.endsWith(path,"tanks.gas"))return true;
-				if(StringUtils.endsWith(path,"tanks.liveWell"))return true;
-				if(StringUtils.endsWith(path,"tanks.lubrication"))return true;
-				if(StringUtils.endsWith(path,"tanks.wasteWater"))return true;
-			}
-			if(StringUtils.equals(path,"aircraft"))return true;
-			if(StringUtils.equals(path,"aton"))return true;
-			if(StringUtils.equals(path,"sar"))return true;
-			
-			return false;
-		
+		if(StringUtils.equals(path,"logbook.auto"))return true;
+		if(StringUtils.equals(path,"logbook.event"))return true;
+		if(StringUtils.equals(path,"resources.charts"))return true;
+		if(StringUtils.equals(path,"resources.routes"))return true;
+		if(StringUtils.equals(path,"resources.notes"))return true;
+		if(StringUtils.equals(path,"resources.regions"))return true;
+		if(StringUtils.equals(path,"resources.waypoints"))return true;
+		if(StringUtils.equals(path,"vessels"))return true;
+		if(StringUtils.startsWith(path, "vessels.")&& uuidMatch.matcher(path).find()) {
+			if(StringUtils.endsWith(path,"electrical.ac"))return true;
+			if(StringUtils.endsWith(path,"electrical.alternators"))return true;
+			if(StringUtils.endsWith(path,"electrical.batteries"))return true;
+			if(StringUtils.endsWith(path,"electrical.chargers"))return true;
+			if(StringUtils.endsWith(path,"electrical.inverters"))return true;
+			if(StringUtils.endsWith(path,"electrical.solar"))return true;
+			if(StringUtils.endsWith(path,"propulsion"))return true;
+			if(StringUtils.endsWith(path,"sails.inventory"))return true;
+			if(StringUtils.endsWith(path,"tanks.baitWell"))return true;
+			if(StringUtils.endsWith(path,"tanks.ballast"))return true;
+			if(StringUtils.endsWith(path,"tanks.blackWater"))return true;
+			if(StringUtils.endsWith(path,"tanks.freshWater"))return true;
+			if(StringUtils.endsWith(path,"tanks.fuel"))return true;
+			if(StringUtils.endsWith(path,"tanks.gas"))return true;
+			if(StringUtils.endsWith(path,"tanks.liveWell"))return true;
+			if(StringUtils.endsWith(path,"tanks.lubrication"))return true;
+			if(StringUtils.endsWith(path,"tanks.wasteWater"))return true;
+		}
+		if(StringUtils.equals(path,"aircraft"))return true;
+		if(StringUtils.equals(path,"aton"))return true;
+		if(StringUtils.equals(path,"sar"))return true;
+
+		return false;
 	}
 	
 }

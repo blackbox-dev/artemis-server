@@ -68,6 +68,7 @@ import java.util.concurrent.TimeUnit;
 import javax.jmdns.JmmDNS;
 import javax.jmdns.ServiceInfo;
 
+import nz.co.fortytwo.signalk.artemis.handler.*;
 import org.apache.activemq.artemis.api.core.ActiveMQException;
 import org.apache.activemq.artemis.api.core.client.ClientConsumer;
 import org.apache.activemq.artemis.api.core.client.ClientMessage;
@@ -96,6 +97,7 @@ import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Log4J2LoggerFactory;
 import mjson.Json;
+
 import nz.co.fortytwo.signalk.artemis.handler.AlarmHandler;
 import nz.co.fortytwo.signalk.artemis.handler.AnchorWatchHandler;
 import nz.co.fortytwo.signalk.artemis.handler.AuthHandler;
@@ -110,6 +112,7 @@ import nz.co.fortytwo.signalk.artemis.handler.NMEAMsgHandler;
 import nz.co.fortytwo.signalk.artemis.handler.SubscribeMsgHandler;
 
 import nz.co.fortytwo.signalk.artemis.handler.TrueWindHandler;
+
 import nz.co.fortytwo.signalk.artemis.scheduled.DeclinationUpdater;
 import nz.co.fortytwo.signalk.artemis.scheduled.TimeUpdater;
 import nz.co.fortytwo.signalk.artemis.serial.SerialPortManager;
@@ -247,7 +250,6 @@ public final class ArtemisServer {
 		SignalkDemoService demo = new SignalkDemoService(true);
 		Thread t = new Thread(demo);
 		t.run();
-
 	}
 
 	private String getHostUrls(String scheme, int port) throws UnknownHostException, SocketException {
@@ -429,18 +431,22 @@ public final class ArtemisServer {
 		handlerList.add(new AnchorWatchHandler());
 		handlerList.add(new AlarmHandler());
 		handlerList.add(new NMEAMsgHandler());
-		handlerList.add(new N2kMsgHandler());
+		handlerList.add(new 
+                    ());
 		handlerList.add(new GetMsgHandler());
 		handlerList.add(new AuthHandler());
 		handlerList.add(new DeltaMsgHandler());
 		handlerList.add(new FullMsgHandler());
 		handlerList.add(new SubscribeMsgHandler());
+		handlerList.add(new LogbookAutoHandler());
+		handlerList.add(new LogbookEventHandler());
+		handlerList.add(new TimerHandler());
+
 		
 		for(BaseHandler base: handlerList) {
 			base.startConsumer();
 		}
 		
-
 	}
 
 	private static void addShutdownHook(final ArtemisServer server) {

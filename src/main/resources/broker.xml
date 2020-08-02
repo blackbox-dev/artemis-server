@@ -129,7 +129,7 @@
 			</divert>
 			<divert name="raw-nmea-divert">
 				<address>incoming.raw</address>
-				<forwarding-address>internal.discard</forwarding-address>
+				<forwarding-address>internal.nmea</forwarding-address>
 				<filter string="AMQ_content_type='0183'" />
 				<exclusive>true</exclusive>
 			</divert>
