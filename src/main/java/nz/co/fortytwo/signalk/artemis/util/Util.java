@@ -387,9 +387,11 @@ public class Util {
 		if (paths[0].equals(vessels)) {
 			return paths[0]+dot+paths[1];
 		}
+
 		if (paths[0].equals(logbook)) {
 			return paths[0]+dot+paths[1];
 		}
+
 		if (paths[0].equals(LIST)&&paths[1].equals(vessels)) {
 			if(paths.length>2) {
 				return paths[0]+dot+paths[1]+dot+paths[2];

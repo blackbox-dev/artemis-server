@@ -97,6 +97,22 @@ import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Log4J2LoggerFactory;
 import mjson.Json;
+
+import nz.co.fortytwo.signalk.artemis.handler.AlarmHandler;
+import nz.co.fortytwo.signalk.artemis.handler.AnchorWatchHandler;
+import nz.co.fortytwo.signalk.artemis.handler.AuthHandler;
+import nz.co.fortytwo.signalk.artemis.handler.BaseHandler;
+import nz.co.fortytwo.signalk.artemis.handler.DeltaMsgHandler;
+import nz.co.fortytwo.signalk.artemis.handler.FullMsgHandler;
+import nz.co.fortytwo.signalk.artemis.handler.GetMsgHandler;
+import nz.co.fortytwo.signalk.artemis.handler.InfluxDbHandler;
+
+import nz.co.fortytwo.signalk.artemis.handler.N2kMsgHandler;
+import nz.co.fortytwo.signalk.artemis.handler.NMEAMsgHandler;
+import nz.co.fortytwo.signalk.artemis.handler.SubscribeMsgHandler;
+
+import nz.co.fortytwo.signalk.artemis.handler.TrueWindHandler;
+
 import nz.co.fortytwo.signalk.artemis.scheduled.DeclinationUpdater;
 import nz.co.fortytwo.signalk.artemis.scheduled.TimeUpdater;
 import nz.co.fortytwo.signalk.artemis.serial.SerialPortManager;
@@ -126,6 +142,7 @@ public final class ArtemisServer {
 	private nz.co.fortytwo.signalk.artemis.server.NettyServer nmeaServer;
 	private ClientSession session;
 	private ClientConsumer consumer;
+
 	private List<BaseHandler> handlerList= new ArrayList<>();
 	
 	public ArtemisServer() throws Exception {
@@ -233,7 +250,6 @@ public final class ArtemisServer {
 		SignalkDemoService demo = new SignalkDemoService(true);
 		Thread t = new Thread(demo);
 		t.run();
-		
 	}
 
 	private String getHostUrls(String scheme, int port) throws UnknownHostException, SocketException {
@@ -409,12 +425,14 @@ public final class ArtemisServer {
 	}
 
 	private void startKvHandlers() throws Exception {
+
 		handlerList.add(new InfluxDbHandler());
 		handlerList.add(new TrueWindHandler());
 		handlerList.add(new AnchorWatchHandler());
 		handlerList.add(new AlarmHandler());
 		handlerList.add(new NMEAMsgHandler());
-		handlerList.add(new N2kMsgHandler());
+		handlerList.add(new 
+                    ());
 		handlerList.add(new GetMsgHandler());
 		handlerList.add(new AuthHandler());
 		handlerList.add(new DeltaMsgHandler());
@@ -423,6 +441,7 @@ public final class ArtemisServer {
 		handlerList.add(new LogbookAutoHandler());
 		handlerList.add(new LogbookEventHandler());
 		handlerList.add(new TimerHandler());
+
 		
 		for(BaseHandler base: handlerList) {
 			base.startConsumer();
