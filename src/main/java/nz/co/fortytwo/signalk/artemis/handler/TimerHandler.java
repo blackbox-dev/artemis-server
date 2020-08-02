@@ -1,13 +1,19 @@
 package nz.co.fortytwo.signalk.artemis.handler;
 
 import mjson.Json;
+import nz.co.fortytwo.signalk.artemis.util.Config;
+import nz.co.fortytwo.signalk.artemis.util.SecurityUtils;
+import nz.co.fortytwo.signalk.artemis.util.SignalKConstants;
 import nz.co.fortytwo.signalk.artemis.util.Util;
 import org.apache.activemq.artemis.api.core.ActiveMQException;
 import org.apache.activemq.artemis.api.core.Message;
+import org.apache.activemq.artemis.api.core.client.ClientMessage;
+import org.apache.activemq.artemis.core.client.impl.ClientMessageImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.ws.rs.core.MediaType;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -25,6 +31,7 @@ public class TimerHandler extends BaseHandler {
 
 	private static AtomicInteger timerCounter = new AtomicInteger(0);
 
+	private ClientMessage timerMessage = null;
 	private static final int defaultTimerValue = 1800; // in seconds = 30 minutes
 	private static final String conditionTimerID = "conditionTimerID"; // ID for condition "restarting timer when timer 0"
 	private static final String conditionLogbookEntryID = "conditionLogbookEntryID"; /// ID for condition "send auto logbookEntry message when timer 0"
@@ -35,8 +42,10 @@ public class TimerHandler extends BaseHandler {
 			logger.debug("Initialising for : {} ", uuid);
 		try {
 			initSession(AMQ_INFLUX_KEY+" LIKE '%"+nav_datetime+"%' OR "
-							+AMQ_INFLUX_KEY+" LIKE '%"+timer+"%'");
+							+AMQ_INFLUX_KEY+" LIKE '%"+timer+".set%' OR "
+							+AMQ_INFLUX_KEY+" LIKE '%"+timer+".condition%'");
 			// Creates a Timer set on defaultTimerValue; if timer expires, message for logbookentry auto will get send and timer will be restarted
+			timerMessage = getDefaultMessage();
 			createDefaultTimerWithLogbookEntry();
 		} catch (Exception e) {
 			logger.error(e, e);
@@ -74,16 +83,20 @@ public class TimerHandler extends BaseHandler {
 					}
 				}
 			}
+			sendTMessage(timerMessage, "vessels." + uuid + dot + timer + dot + "time",  Json.read("{\"value\":"+timerVal+"}"));
+
 		} else if(keyBeforeValues.endsWith("timer.set")) {
 			timerCounter.set(value.at("setTimer").asInteger());
-		} else if (keyBeforeValues.endsWith("timer.condition.set")) {
-			if(value.has("action") && (value.has("id"))) {
-				timerConditionMap.put(value.at("id").asString(), value);
+		} else if (keyBeforeValues.endsWith("set")) { // "timer.condition.[id].set"))
+			String keyParsedPre= StringUtils.substringBeforeLast(keyBeforeValues,".");
+			String conditionId = StringUtils.substringAfterLast(keyParsedPre,".");
+			if(value.has("action")) {
+				timerConditionMap.put(conditionId, value);
 			}
-		} else if(keyBeforeValues.endsWith("timer.condition.delete")) {
-			if(value.has("id") && timerConditionMap.containsKey(value.at("id").asString())) {
-				timerConditionMap.remove(value.at("id").asString());
-			}
+		} else if(keyBeforeValues.endsWith(".delete")) { // timer.condition.[id].delete"
+			String keyParsedPre= StringUtils.substringBeforeLast(keyBeforeValues,".");
+			String conditionId = StringUtils.substringAfterLast(keyParsedPre,".");
+			sendTMessage(timerMessage, "vessels." + uuid + dot + "timer.condition."+conditionId+".set",  Json.read("{\"value\": null}"));
 		}
 	}
 
@@ -103,20 +116,38 @@ public class TimerHandler extends BaseHandler {
 	}
 
 	private void createDefaultTimerWithLogbookEntry() {
-		Json timerValueJson = Json.read("{\"id\":\"" + conditionTimerID + "\", \"onTimerValue\": 0, \"action\": \"setTimer\", \"setTimer\":"+ defaultTimerValue +"}");
-		timerConditionMap.put(timerValueJson.at("id").asString(), timerValueJson);
-		Json logbookValueJson = Json.read("{\"id\":\"" + conditionLogbookEntryID + "\", \"onTimerValue\": 0, \"action\" : \"logbookEntry\"}");
-		timerConditionMap.put(logbookValueJson.at("id").asString(), logbookValueJson);
 
-		timerCounter.set(defaultTimerValue);
+		String keyD2 = "vessels." + uuid + dot + "timer.condition.defaultSetTimer.set";
+		ClientMessage message2 = getDefaultMessage();
+		Json jsonVal2 = Json.read("{\"value\":{\"onTimerValue\": 0, \"action\": \"setTimer\", \"setTimer\":"+ defaultTimerValue +"}}");
+		sendTMessage(message2, keyD2, jsonVal2);
+
+
+
+		String keyD1 = "vessels." + uuid + dot + "timer.condition.defaultLogbookEntry.set";
+		ClientMessage message1 = getDefaultMessage();
+		Json jsonVal1 = Json.read("{\"value\":{\"onTimerValue\": 0, \"action\" : \"logbookEntry\"}}");
+		sendTMessage(message1, keyD1, jsonVal1);
+
+		String keyD = "vessels." + uuid + dot + "timer.set";
+		Json jsonVal = Json.read("{\"value\":{\"setTimer\":" +defaultTimerValue+"}}");
+		sendTMessage(getDefaultMessage(), keyD, jsonVal);
 	}
 
-	public int getTimerCounter() {
-		return timerCounter.get();
+	private ClientMessage getDefaultMessage() {
+		ClientMessage txMsg = null;
+		txMsg = getTxSession().createMessage(true);
+		txMsg.putStringProperty(Config.MSG_SRC_BUS, "self.internal");
+		txMsg.putStringProperty(Config.MSG_SRC_TYPE, Config.MSG_SRC_TYPE_INTERNAL_PROCESS);
+		txMsg.putStringProperty(Config.AMQ_CONTENT_TYPE, Config.AMQ_CONTENT_TYPE_JSON);
+		String token = null;
+		try {
+			token = SecurityUtils.authenticateUser("admin", "admin");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		txMsg.putStringProperty(Config.AMQ_USER_ROLES, SecurityUtils.getRoles(token).toString());
+		txMsg.putStringProperty(Config.AMQ_INFLUX_KEY, "vessels."+uuid+"."+key);
+		return txMsg;
 	}
-
-	public NavigableSet<String> getIdsOfConditions() {
-		return timerConditionMap.navigableKeySet();
-	}
-
 }
