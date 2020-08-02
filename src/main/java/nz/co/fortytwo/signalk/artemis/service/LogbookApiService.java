@@ -67,17 +67,18 @@ public class LogbookApiService extends BaseApiService {
 			+ " This is a 'fire-and-forget' method, see PUT ")
 	@ApiResponses ({
 	    @ApiResponse(responseCode = "200", description = "OK", 
-	    		content = @Content(
-                        mediaType = MediaType.TEXT_PLAIN, 
-                        schema = @Schema(example = "\"logbook.event.urn:mrn:signalk:uuid:a8fb07c0-1ffd-4663-899c-f16c2baf8270\"")
-                        )
-                ),
+	    		content = {@Content(
+						mediaType = MediaType.APPLICATION_JSON,
+						examples = @ExampleObject(name="update", value = "{\"test\"}")
+				)
+				}),
 	    @ApiResponse(responseCode = "500", description = "Internal server error"),
 	    @ApiResponse(responseCode = "403", description = "No permission"),
 	    @ApiResponse(responseCode = "400", description = "Bad request if message is not understood")
 	    })
 	@Consumes(MediaType.APPLICATION_JSON)
 	@POST
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("event")
 	public String postAt(@Parameter(in = ParameterIn.COOKIE, name = SK_TOKEN) @CookieParam(SK_TOKEN) Cookie cookie,
 			@Parameter( name="body", 
@@ -97,7 +98,10 @@ public class LogbookApiService extends BaseApiService {
 			Json msg = Util.getJsonPostRequest(sanitizeApiPath(logbookPath),Json.read(body));
 			sendMessage(getTempQ(),addToken(msg, cookie),null,getToken(cookie));
 			getResource(request).suspend();
-			return "Ok";
+			JsonObject ret = new JsonObject();
+			ret.addProperty("status", "OKKK");
+		System.out.println(ret.toString());
+			return ret.toString();
 	}
 
 	private JsonArray createJsonObject(List<QueryResult.Series> queryResult) {
@@ -218,8 +222,45 @@ public class LogbookApiService extends BaseApiService {
 		System.out.println("query: " + query);
 		List<QueryResult.Series> queryResult = logbookDbService.getMeasurements(query);
 		System.out.println("queryResult: " + queryResult);
-		JsonArray measurements = createJsonObject(queryResult);
-		//return Json.object().set("requestId", "requestId").set("state", "state").set("result", "result").toString();
+		JsonArray measurements;
+		if(queryResult == null) {
+			System.out.println("HERE");
+			measurements = new JsonArray();
+		} else {
+			measurements = createJsonObject(queryResult);
+		}
+		System.out.println("-----" + measurements.toString());
+		return measurements.toString();
+	}
+
+	@Operation(summary = "Request logbook data", description = "Returns the last 'n' logbook entries")
+	@ApiResponses ({
+			@ApiResponse(responseCode = "200", description = "OK",
+					content = {@Content(mediaType = MediaType.APPLICATION_JSON,
+							examples = @ExampleObject(name="update", value = "{\"test\"}"))
+					}),
+			@ApiResponse(responseCode = "500", description = "Internal server error"),
+			@ApiResponse(responseCode = "403", description = "No permission")
+	})
+	@Produces(MediaType.APPLICATION_JSON)
+	@GET
+	@Path("/event/getMeasurements/amt")
+	public String getMeasurementsWithAmt(@Parameter(in = ParameterIn.COOKIE, name = SK_TOKEN) @CookieParam(SK_TOKEN) Cookie cookie,
+							 @Parameter( description = "The number of points to return", example="5") @QueryParam("amount")String amount) throws Exception
+	{
+		System.out.println("Amount: " + amount);
+
+		String query = "SELECT * FROM event ORDER BY time DESC LIMIT " + amount;
+		System.out.println("query: " + query);
+		List<QueryResult.Series> queryResult = logbookDbService.getMeasurements(query);
+		System.out.println("queryResult: " + queryResult);
+		JsonArray measurements;
+		if(queryResult == null) {
+			measurements = new JsonArray();
+		} else {
+			measurements = createJsonObject(queryResult);
+		}
+		System.out.println("-----" + measurements.toString());
 		return measurements.toString();
 	}
 }
