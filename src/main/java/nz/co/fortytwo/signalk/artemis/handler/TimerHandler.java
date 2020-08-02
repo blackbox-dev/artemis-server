@@ -73,6 +73,7 @@ public class TimerHandler extends BaseHandler {
 						String idLogbook = "vessels." + uuid + dot + logbook + dot + auto + ".values.unknown";
 						sendTMessage(message, idLogbook, emptyJson);
 					} else if (action.equals("notification")) {
+
 						Json notification = jsonValue.at("notification");
 						Json notificationJson = buildNotificationJson(notification.at("state"), notification.at("method"), notification.at("message"));
 						int len = Util.getContext(key).length();
