@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import nz.co.fortytwo.signalk.artemis.util.SecurityUtils;
 import org.apache.activemq.artemis.api.core.ActiveMQException;
 import org.apache.activemq.artemis.api.core.SimpleString;
 import org.apache.activemq.artemis.api.core.client.ClientMessage;
@@ -46,6 +47,13 @@ public class SignalkDemoService extends MessageSupport implements Runnable {
 			txMsg.getBodyBuffer().writeString(itr.next());
 			txMsg.putStringProperty(Config.MSG_SRC_BUS, "/dev/DEMO");
 			txMsg.putStringProperty(Config.MSG_SRC_TYPE, Config.MSG_SRC_TYPE_SERIAL);
+			String token = null;
+			try {
+				token = SecurityUtils.authenticateUser("admin", "admin");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			txMsg.putStringProperty(Config.AMQ_USER_ROLES, SecurityUtils.getRoles(token).toString());
 			getProducer().send(new SimpleString(Config.INCOMING_RAW), txMsg);
 			c.getAndIncrement();
 			if(delay>0) {
