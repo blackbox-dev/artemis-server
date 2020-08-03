@@ -73,6 +73,7 @@ public class AlarmHandler extends BaseHandler {
 			// load all keys with alarms
 			NavigableMap<String, Json> map = loadAlarms(influx);
 			for (Entry<String, Json> entry : map.entrySet()) {
+				// TODO: check if null
 				parseMeta(entry.getKey(), entry.getValue());
 			}
 
@@ -131,18 +132,23 @@ public class AlarmHandler extends BaseHandler {
 
 		String parentKey = StringUtils.substringBeforeLast(key, ".meta.");
 		String metaKey = StringUtils.substringAfterLast(key, ".meta.");
-		Json metaJson = alarmMap.get(parentKey);
-		if (metaJson == null) {
-			metaJson = Json.object();
-		}
+		Json metaJson = null;
 		if(node.has("value")) {
 			node = node.at("value");
 		}
-		Util.setJson(metaJson, metaKey, node);
-		alarmMap.put(parentKey, metaJson);
-		if (logger.isDebugEnabled())
-			logger.debug("Added alarm for key: {} : {}", parentKey, metaJson);
+		if(node.toString() == "null") {
+			alarmMap.remove(parentKey);
+		} else {
+			metaJson = alarmMap.get(parentKey);
+			if (metaJson == null) {
+				metaJson = Json.object();
+			}
+			Util.setJson(metaJson, metaKey, node);
+			alarmMap.put(parentKey, metaJson);
+			if (logger.isDebugEnabled())
+				logger.debug("Added alarm for key: {} : {}", parentKey, metaJson);
 
+		}
 	}
 
 	protected void check(Message message, String key, Json alarmDef, Json node) {
