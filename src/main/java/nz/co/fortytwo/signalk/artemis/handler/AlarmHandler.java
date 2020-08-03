@@ -180,12 +180,12 @@ public class AlarmHandler extends BaseHandler {
 							if (warn.equals(state)) {
 								// notification.at(value).set("method", alarmDef.at("warnMethod"));
 								sendJson(message, key,
-										getNotification(state, zone.at("message"), alarmDef.at("warnMethod")));
+										getNotification(state, zone.at("message"), zone.at("method")));
 							}
 							if (alarm.equals(state)) {
 								// notification.at(value).set("method", alarmDef.at("alarmMethod"));
 								sendJson(message, key,
-										getNotification(state, zone.at("message"), alarmDef.at("alarmMethod")));
+										getNotification(state, zone.at("message"), zone.at("method")));
 							}
 							if (logger.isDebugEnabled())
 								logger.debug("  Sending alarm: {}={}", key, state);
