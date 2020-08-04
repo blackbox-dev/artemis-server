@@ -71,6 +71,10 @@ public class LogbookDbService {
         String test = "1592172537468000000";
         long nano = Instant.parse(timestamp).toEpochMilli();
         String nanoToString = nano + "000000";
+
+        eventType = eventType.replaceAll(" ", "_");
+        System.out.println(String.format("#####\nNEW EVENTYTPE: %s\n######", eventType));
+
         logbookInfluxDB.write(Point.measurement("event")
                 //.time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 //.time(Long.parseLong(nano), TimeUnit.NANOSECONDS)

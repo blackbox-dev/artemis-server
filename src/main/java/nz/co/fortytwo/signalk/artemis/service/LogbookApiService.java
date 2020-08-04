@@ -115,7 +115,7 @@ public class LogbookApiService extends BaseApiService {
 			JsonObject measurement = new JsonObject();
 
 			measurement.addProperty("time", (String) v.get(columns.indexOf("time")));
-			measurement.addProperty("type", (String) v.get(columns.indexOf("type")));
+			measurement.addProperty("type", (String) v.get(columns.indexOf("type")).toString().replaceAll("_", " "));
 			// navigation object include position, stw, sog, cog, heading
 			JsonObject navigation = new JsonObject();
 			JsonObject long_lat = new JsonObject();
