@@ -186,7 +186,7 @@ public class Config {
 		model.put(ConfigConstants.STORAGE_ROOT, Json.make("./storage/"));
 		model.put(ConfigConstants.STATIC_DIR, Json.make("./signalk-static/"));
 		model.put(ConfigConstants.MAP_DIR, Json.make("./mapcache/"));
-		model.put(ConfigConstants.DEMO, Json.make(false));
+		model.put(ConfigConstants.DEMO, Json.make(true));
 		model.put(ConfigConstants.DEMO_DELAY, Json.make(250));
 		model.put(ConfigConstants.STREAM_URL, Json.make("motu.log"));
 		model.put(ConfigConstants.USBDRIVE, Json.make("/media/usb0"));
