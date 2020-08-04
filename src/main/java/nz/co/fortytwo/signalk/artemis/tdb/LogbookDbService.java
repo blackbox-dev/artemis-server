@@ -49,7 +49,6 @@ public class LogbookDbService {
     }
 
     public void saveToLogbook(String eventType, String timestamp) {
-        System.out.println("#####\n#######\n"+timestamp+"\n#####\n#######");
         // Get necessary information from vessels measurement
         String query = "select * from vessels group by skey, primary, uuid, sourceRef order by time desc limit 1";
         NavigableMap<String, Json> map = new ConcurrentSkipListMap<>();
@@ -73,7 +72,6 @@ public class LogbookDbService {
         String nanoToString = nano + "000000";
 
         eventType = eventType.replaceAll(" ", "_");
-        System.out.println(String.format("#####\nNEW EVENTYTPE: %s\n######", eventType));
 
         logbookInfluxDB.write(Point.measurement("event")
                 //.time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
@@ -94,7 +92,6 @@ public class LogbookDbService {
                 .addField("windDirection", Float.parseFloat(windDirection))
                 .addField("waterTemp", Float.parseFloat(waterTemp))
                 .build());
-        System.out.println("#######\nHERE\n#######");
 
         // send curl post request to telegraf
         try {
