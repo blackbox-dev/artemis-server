@@ -1,7 +1,9 @@
+
 version: '3.3'
 services:
   influxdb:
     image: blackbox:influxdb
+
     container_name: influxdb
     ports:
       - 8086:8086
@@ -10,6 +12,7 @@ services:
       - /var/lib/influxdb:/var/lib/influxdb:Z
     command: influxd
     network_mode: host
+
   signalk:
     image: blackbox:signalk
     container_name: signalk
@@ -45,3 +48,4 @@ services:
        - /proc:/rootfs/proc:ro
        - /etc:/rootfs/etc:ro
      network_mode: host
+

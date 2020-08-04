@@ -34,8 +34,13 @@ public class LogbookDbService {
         } catch(InfluxDBException e) {
             logger.error("Failed to connect to influx: ", e);
         }
-        // connection successful; set database to logbook
-        logbookInfluxDB.setDatabase(dbName);
+        try {
+            // connection successful; set database to logbook
+            this.logbookInfluxDB.setDatabase(dbName);
+        } catch(InfluxDBException ex) {
+            logger.error("Failed to connect to database '" + dbName + "': ", ex);
+        }
+
         // enable batch writes to get better performance
         logbookInfluxDB.enableBatch(BatchOptions.DEFAULTS);
         // retention policy states how long influx should store the data before deleting it
@@ -48,25 +53,6 @@ public class LogbookDbService {
         NavigableMap<String, Json> map = new ConcurrentSkipListMap<>();
         artemisInfluxDB.loadData(map, query);
 
-        /*
-        * Important values are
-        * navigation:
-        *   * position (lon, lat)
-        *   * heading (navigation.headingMagnetic?),
-        *   * STW (kn)
-        *   * SOG (kn)
-        *   * COG (true or magnetic?) (deg)
-        * environment
-        *   * depth (m)
-        *   * wind
-        *     * AWS (kn)
-        *     * AWA (deg)
-        *     * TWS (kn) environment.wind.speetTrue
-        *     * TWA (deg)
-        *     * true wind direction
-        *   * water temperature
-        *   * air temperature
-        * */
         String[] posValues = getValue(map, "navigation.position").split(",");
         String depth = getValue(map, "environment.depth.belowTransducer");
         String aws = getValue(map, "environment.wind.speedApparent");

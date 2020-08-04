@@ -415,12 +415,43 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.22.1</version>
+				<version>3.0.0-M3</version>
 				<configuration>
-					<argLine>-XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI
+					<argLine>@{argLine} -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI
 						--module-path=${compiler.dir}
 						--upgrade-module-path=${compiler.dir}/compiler.jar</argLine>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eluder.coveralls</groupId>
+				<artifactId>coveralls-maven-plugin</artifactId>
+				<version>4.3.0</version>
+				<configuration>
+					<repoToken>t9xs8UwGd5ZOdx65f8cSMN71fZiCegSpe</repoToken>
+					<sourceEncoding>UTF-8</sourceEncoding>
+					<sourceDirectories>
+						<sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+					</sourceDirectories>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.4</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

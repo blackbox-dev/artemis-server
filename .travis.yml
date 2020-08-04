@@ -1,0 +1,36 @@
+language: java
+sudo: required
+
+jdk:
+  - openjdk13
+
+script: mvn clean jacoco:prepare-agent install jacoco:report
+
+services:
+  - docker
+dist: trusty
+
+env:
+  COMPOSE_VERSION: 1.24.1
+
+before_install:
+  # Docker Compose Install
+  - curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+  # Download and install Docker libs
+  - curl -L https://github.com/Ortus-Solutions/docker-buildfiles/archive/master.zip > docker.zip
+  - unzip docker.zip -d workbench
+  - mv workbench/docker-buildfiles-master workbench/docker
+
+install:
+  - docker build --tag signalk:influxdb influxdb/
+  - docker-compose build
+  - docker-compose up -d
+
+after_script:
+  - docker-compose stop
+  - docker-compose rm -f
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
