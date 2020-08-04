@@ -9,12 +9,14 @@ yes Yes | sudo apt-get install \
     gnupg-agent \
     software-properties-common
 sudo apt update
+
+#install docker
 yes Yes | curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
 sudo apt update
 apt-cache policy docker-ce
 yes Yes | sudo apt install docker-ce
 
-
+#install docker-compose
 sudo curl -L "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 
@@ -29,8 +31,6 @@ sudo . /etc/environment
 #download the artemis-server
 git clone https://github.com/blackbox-dev/artemis-server.git
 cd /artemis-server
-#checkout correct branch for building docker
-sudo git checkout persistToInflux 
 sudo mvn clean install -Dmaven.test.skip=true
 sudo chmod 777 docker/signalk/signalk_entrypoint.sh
 
@@ -38,6 +38,7 @@ sudo chmod 777 docker/signalk/signalk_entrypoint.sh
 ###config has to be added manually###
 sudo mkdir /etc/telegraf && sudo touch /etc/telegraf/telegraf.conf
 
+#build docker images
 sudo docker build --tag blackbox:signalk -f docker/signalk/Dockerfile .
 sudo docker build --tag blackbox:influxdb -f docker/influxdb/Dockerfile .
 sudo docker pull telegraf
