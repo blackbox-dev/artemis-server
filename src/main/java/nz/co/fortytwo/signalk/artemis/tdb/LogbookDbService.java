@@ -34,13 +34,14 @@ public class LogbookDbService {
         } catch(InfluxDBException e) {
             logger.error("Failed to connect to influx: ", e);
         }
-        try {
+        /*try {
             // connection successful; set database to logbook
             this.logbookInfluxDB.setDatabase(dbName);
         } catch(InfluxDBException ex) {
             logger.error("Failed to connect to database '" + dbName + "': ", ex);
-        }
-
+        }*/
+        // connection successful; set database to logbook
+        this.logbookInfluxDB.setDatabase(dbName);
         // enable batch writes to get better performance
         logbookInfluxDB.enableBatch(BatchOptions.DEFAULTS);
         // retention policy states how long influx should store the data before deleting it
@@ -94,10 +95,6 @@ public class LogbookDbService {
             String line_protocol = String.format("event,type=%s posLat=%s,posLong=%s,heading=%s,STW=%s,SOG=%s,COG=%s,depth=%s,AWS=%s,AWA=%s,TWS=%s,TWA=%s,windDirection=%s,waterTemp=%s %s",
                     eventType, posValues[0].trim(), posValues[1].trim(), heading, stw, sog, cog, depth, aws, awa, tws, twa, windDirection, waterTemp, nanoToString);
 
-            /*String line_protocol = String.format("event,type=%s posLat=%f,posLong=%f,heading=%f,STW=%f,SOG=%f,COG=%f,depth=%f,AWS=%f,AWA=%f,TWS=%f,TWA=%f,windDirection=%f,waterTemp=%f %s",
-                    eventType,  Float.parseFloat(posValues[0].trim()), Float.parseFloat(posValues[1].trim()), Float.parseFloat(heading), Float.parseFloat(stw),
-                    Float.parseFloat(sog), Float.parseFloat(cog), Float.parseFloat(depth), Float.parseFloat(aws), Float.parseFloat(awa), Float.parseFloat(tws),
-                    Float.parseFloat(twa), Float.parseFloat(windDirection), Float.parseFloat(waterTemp), Float.parseFloat(nanoToString));*/
             System.out.println("line_protocol: " + line_protocol);
             String[] command = {"/bin/sh", "-c", "curl -i -XPOST 'http://localhost:8186/write' --data-binary '" + line_protocol + "'"};
             Process p = Runtime.getRuntime().exec(command);
