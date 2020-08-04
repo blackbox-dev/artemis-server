@@ -42,8 +42,8 @@ public class TimerHandler extends BaseHandler {
 			logger.debug("Initialising for : {} ", uuid);
 		try {
 			initSession(AMQ_INFLUX_KEY+" LIKE '%"+nav_datetime+"%' OR "
-							+AMQ_INFLUX_KEY+" LIKE '%"+timer+".set%' OR "
-							+AMQ_INFLUX_KEY+" LIKE '%"+timer+".condition%'");
+					+AMQ_INFLUX_KEY+" LIKE '%"+timer+".set%' OR "
+					+AMQ_INFLUX_KEY+" LIKE '%"+timer+".condition%'");
 			// Creates a Timer set on defaultTimerValue; if timer expires, message for logbookentry auto will get send and timer will be restarted
 			timerMessage = getDefaultMessage();
 		} catch (Exception e) {
