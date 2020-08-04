@@ -119,27 +119,27 @@ public class LogbookApiService extends BaseApiService {
 			// navigation object include position, stw, sog, cog, heading
 			JsonObject navigation = new JsonObject();
 			JsonObject long_lat = new JsonObject();
-			long_lat.addProperty("long", (String) v.get(columns.indexOf("posLong")));
-			long_lat.addProperty("lat", (String) v.get(columns.indexOf("posLat")));
+			long_lat.addProperty("long", v.get(columns.indexOf("posLong")).toString());
+			long_lat.addProperty("lat", v.get(columns.indexOf("posLat")).toString());
 			navigation.add("position", long_lat); // add position to navigation object
 
 			JsonObject heading_value_unit = new JsonObject();
-			heading_value_unit.addProperty("value", (String) v.get(columns.indexOf("heading")));
+			heading_value_unit.addProperty("value", v.get(columns.indexOf("heading")).toString());
 			heading_value_unit.addProperty("unit", "rad");
 			navigation.add("heading", heading_value_unit);
 
 			JsonObject stw_value_unit = new JsonObject();
-			stw_value_unit.addProperty("value", (String) v.get(columns.indexOf("STW")));
+			stw_value_unit.addProperty("value", v.get(columns.indexOf("STW")).toString());
 			stw_value_unit.addProperty("unit", "m/s");
 			navigation.add("STW", stw_value_unit); // add STW to navigation object
 
 			JsonObject sog_value_unit = new JsonObject();
-			sog_value_unit.addProperty("value", (String) v.get(columns.indexOf("SOG")));
+			sog_value_unit.addProperty("value", v.get(columns.indexOf("SOG")).toString());
 			sog_value_unit.addProperty("unit", "m/s");
 			navigation.add("SOG", sog_value_unit); // add SOG to navigation object
 
 			JsonObject cog_value_unit = new JsonObject();
-			cog_value_unit.addProperty("value", (String) v.get(columns.indexOf("COG")));
+			cog_value_unit.addProperty("value", v.get(columns.indexOf("COG")).toString());
 			cog_value_unit.addProperty("unit", "rad");
 			navigation.add("COG", cog_value_unit); // add COG to navigation object
 
@@ -148,39 +148,39 @@ public class LogbookApiService extends BaseApiService {
 			// environment object including depth, wind (aws, awa, tws, twa) water
 			JsonObject environment = new JsonObject();
 			JsonObject depth_value_unit = new JsonObject();
-			depth_value_unit.addProperty("value", (String) v.get(columns.indexOf("depth")));
+			depth_value_unit.addProperty("value", v.get(columns.indexOf("depth")).toString());
 			depth_value_unit.addProperty("unit", "m"); // add depth to environment object
 			environment.add("depth", depth_value_unit);
 
 			JsonObject wind = new JsonObject();
 			JsonObject aws_value_unit = new JsonObject();
-			aws_value_unit.addProperty("value", (String) v.get(columns.indexOf("AWS")));
+			aws_value_unit.addProperty("value", v.get(columns.indexOf("AWS")).toString());
 			aws_value_unit.addProperty("unit", "m/s");
 			wind.add("AWS", aws_value_unit);
 
 			JsonObject awa_value_unit = new JsonObject();
-			awa_value_unit.addProperty("value", (String) v.get(columns.indexOf("AWA")));
+			awa_value_unit.addProperty("value", v.get(columns.indexOf("AWA")).toString());
 			awa_value_unit.addProperty("unit", "rad");
 			wind.add("AWA", awa_value_unit);
 
 			JsonObject tws_value_unit = new JsonObject();
-			tws_value_unit.addProperty("value", (String) v.get(columns.indexOf("TWS")));
+			tws_value_unit.addProperty("value", v.get(columns.indexOf("TWS")).toString());
 			tws_value_unit.addProperty("unit", "m/s");
 			wind.add("TWS", tws_value_unit);
 
 			JsonObject twa_value_unit = new JsonObject();
-			twa_value_unit.addProperty("value", (String) v.get(columns.indexOf("TWA")));
+			twa_value_unit.addProperty("value", v.get(columns.indexOf("TWA")).toString());
 			twa_value_unit.addProperty("unit", "rad");
 			wind.add("TWA", twa_value_unit);
 
 			JsonObject wind_direction_value_unit = new JsonObject();
-			wind_direction_value_unit.addProperty("value", (String) v.get(columns.indexOf("windDirection")));
+			wind_direction_value_unit.addProperty("value", v.get(columns.indexOf("windDirection")).toString());
 			wind_direction_value_unit.addProperty("unit", "m/s");
 			wind.add("windDirection", wind_direction_value_unit);
 
 			JsonObject water = new JsonObject();
 			JsonObject temp_value_unit = new JsonObject();
-			temp_value_unit.addProperty("value", (String) v.get(columns.indexOf("waterTemp")));
+			temp_value_unit.addProperty("value", v.get(columns.indexOf("waterTemp")).toString());
 			temp_value_unit.addProperty("unit", "K");
 			water.add("temperature", temp_value_unit);
 
