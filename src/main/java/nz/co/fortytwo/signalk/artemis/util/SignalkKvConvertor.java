@@ -95,7 +95,7 @@ public class SignalkKvConvertor {
 
 	/**
 	 * Convert Delta JSON to kv and send to kv queue.
-	 * 
+	 *
 	 * @param node
 	 * @return
 	 * @throws ActiveMQException
@@ -185,7 +185,11 @@ public class SignalkKvConvertor {
 				// TODO: for testing security token added: normally should have logged in with admin???
 				String token = SecurityUtils.authenticateUser("admin", "admin");
 				origMessage.putStringProperty(Config.AMQ_USER_ROLES, SecurityUtils.getRoles(token).toString());
-				sender.sendKvMessage(origMessage, ctx + key + dot + values + dot + srcRef, e);
+				if (key.contains("meta")){
+					sender.sendKvMessage(origMessage, ctx + key, e);
+				} else {
+					sender.sendKvMessage(origMessage, ctx + key + dot + values + dot + srcRef, e);
+				}
 			}
 		}
 

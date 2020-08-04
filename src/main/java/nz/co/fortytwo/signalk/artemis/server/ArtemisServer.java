@@ -431,8 +431,7 @@ public final class ArtemisServer {
 		handlerList.add(new AnchorWatchHandler());
 		handlerList.add(new AlarmHandler());
 		handlerList.add(new NMEAMsgHandler());
-		handlerList.add(new 
-                    ());
+		handlerList.add(new N2kMsgHandler());
 		handlerList.add(new GetMsgHandler());
 		handlerList.add(new AuthHandler());
 		handlerList.add(new DeltaMsgHandler());

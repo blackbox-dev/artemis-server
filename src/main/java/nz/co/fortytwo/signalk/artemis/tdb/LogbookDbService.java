@@ -34,13 +34,15 @@ public class LogbookDbService {
         } catch(InfluxDBException e) {
             logger.error("Failed to connect to influx: ", e);
         }
-        try {
+        /*try {
             // connection successful; set database to logbook
             this.logbookInfluxDB.setDatabase(dbName);
         } catch(InfluxDBException ex) {
             logger.error("Failed to connect to database '" + dbName + "': ", ex);
-        }
+        }*/
 
+        // connection successful; set database to logbook
+        this.logbookInfluxDB.setDatabase(dbName);
         // enable batch writes to get better performance
         logbookInfluxDB.enableBatch(BatchOptions.DEFAULTS);
         // retention policy states how long influx should store the data before deleting it

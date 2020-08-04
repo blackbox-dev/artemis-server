@@ -17,6 +17,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static nz.co.fortytwo.signalk.artemis.util.Config.*;
@@ -33,8 +34,7 @@ public class TimerHandler extends BaseHandler {
 
 	private ClientMessage timerMessage = null;
 	private static final int defaultTimerValue = 1800; // in seconds = 30 minutes
-	private static final String conditionTimerID = "conditionTimerID"; // ID for condition "restarting timer when timer 0"
-	private static final String conditionLogbookEntryID = "conditionLogbookEntryID"; /// ID for condition "send auto logbookEntry message when timer 0"
+	private final AtomicBoolean doneInitMessages = new AtomicBoolean();
 
 	public TimerHandler() {
 		super();
@@ -42,11 +42,10 @@ public class TimerHandler extends BaseHandler {
 			logger.debug("Initialising for : {} ", uuid);
 		try {
 			initSession(AMQ_INFLUX_KEY+" LIKE '%"+nav_datetime+"%' OR "
-							+AMQ_INFLUX_KEY+" LIKE '%"+timer+".set%' OR "
-							+AMQ_INFLUX_KEY+" LIKE '%"+timer+".condition%'");
+					+AMQ_INFLUX_KEY+" LIKE '%"+timer+".set%' OR "
+					+AMQ_INFLUX_KEY+" LIKE '%"+timer+".condition%'");
 			// Creates a Timer set on defaultTimerValue; if timer expires, message for logbookentry auto will get send and timer will be restarted
 			timerMessage = getDefaultMessage();
-			createDefaultTimerWithLogbookEntry();
 		} catch (Exception e) {
 			logger.error(e, e);
 		}
@@ -58,7 +57,7 @@ public class TimerHandler extends BaseHandler {
 		String keyBeforeValues = StringUtils.substringBefore(key,dot+values+dot);
 		Json node = Util.readBodyBuffer( message.toCore());
 		Json value = node.at("value");
-
+		createDefaultTimerWithLogbookEntry();
 		if(key.endsWith("navigation.datetime")&& timerCounter.get() > 0){
 			int timerVal = timerCounter.decrementAndGet();
 			NavigableSet<String> idOfConditions = timerConditionMap.navigableKeySet();
@@ -117,22 +116,22 @@ public class TimerHandler extends BaseHandler {
 	}
 
 	private void createDefaultTimerWithLogbookEntry() {
+		if (doneInitMessages.get()) return;
+		if (doneInitMessages.compareAndSet(false, true)) {
+			String keyD2 = "vessels." + uuid + dot + "timer.condition.defaultSetTimer.set";
+			ClientMessage message2 = getDefaultMessage();
+			Json jsonVal2 = Json.read("{\"value\":{\"onTimerValue\": 0, \"action\": \"setTimer\", \"setTimer\":"+ defaultTimerValue +"}}");
+			sendTMessage(message2, keyD2, jsonVal2);
 
-		String keyD2 = "vessels." + uuid + dot + "timer.condition.defaultSetTimer.set";
-		ClientMessage message2 = getDefaultMessage();
-		Json jsonVal2 = Json.read("{\"value\":{\"onTimerValue\": 0, \"action\": \"setTimer\", \"setTimer\":"+ defaultTimerValue +"}}");
-		sendTMessage(message2, keyD2, jsonVal2);
+			String keyD1 = "vessels." + uuid + dot + "timer.condition.defaultLogbookEntry.set";
+			ClientMessage message1 = getDefaultMessage();
+			Json jsonVal1 = Json.read("{\"value\":{\"onTimerValue\": 0, \"action\" : \"logbookEntry\"}}");
+			sendTMessage(message1, keyD1, jsonVal1);
 
-
-
-		String keyD1 = "vessels." + uuid + dot + "timer.condition.defaultLogbookEntry.set";
-		ClientMessage message1 = getDefaultMessage();
-		Json jsonVal1 = Json.read("{\"value\":{\"onTimerValue\": 0, \"action\" : \"logbookEntry\"}}");
-		sendTMessage(message1, keyD1, jsonVal1);
-
-		String keyD = "vessels." + uuid + dot + "timer.set";
-		Json jsonVal = Json.read("{\"value\":{\"setTimer\":" +defaultTimerValue+"}}");
-		sendTMessage(getDefaultMessage(), keyD, jsonVal);
+			String keyD = "vessels." + uuid + dot + "timer.set";
+			Json jsonVal = Json.read("{\"value\":{\"setTimer\":" +defaultTimerValue+"}}");
+			sendTMessage(getDefaultMessage(), keyD, jsonVal);
+		}
 	}
 
 	private ClientMessage getDefaultMessage() {

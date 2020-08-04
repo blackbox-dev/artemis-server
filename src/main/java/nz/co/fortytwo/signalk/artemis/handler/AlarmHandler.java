@@ -28,34 +28,34 @@ import nz.co.fortytwo.signalk.artemis.tdb.TDBService;
 import nz.co.fortytwo.signalk.artemis.util.Util;
 
 /*
-*
-* Copyright (C) 2012-2014 R T Huitema. All Rights Reserved.
-* Web: www.42.co.nz
-* Email: robert@42.co.nz
-* Author: R T Huitema
-*
-* This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
-* WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-* 
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*
-*/
+ *
+ * Copyright (C) 2012-2014 R T Huitema. All Rights Reserved.
+ * Web: www.42.co.nz
+ * Email: robert@42.co.nz
+ * Author: R T Huitema
+ *
+ * This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+ * WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 /**
  * Read key value pairs from Config.INTERNAL_KV and store in influxdb
- * 
+ *
  * @author robert
- * 
+ *
  */
 
 public class AlarmHandler extends BaseHandler {
@@ -73,6 +73,7 @@ public class AlarmHandler extends BaseHandler {
 			// load all keys with alarms
 			NavigableMap<String, Json> map = loadAlarms(influx);
 			for (Entry<String, Json> entry : map.entrySet()) {
+				// TODO: check if null
 				parseMeta(entry.getKey(), entry.getValue());
 			}
 
@@ -131,15 +132,23 @@ public class AlarmHandler extends BaseHandler {
 
 		String parentKey = StringUtils.substringBeforeLast(key, ".meta.");
 		String metaKey = StringUtils.substringAfterLast(key, ".meta.");
-		Json metaJson = alarmMap.get(parentKey);
-		if (metaJson == null) {
-			metaJson = Json.object();
+		Json metaJson = null;
+		if(node.has("value")) {
+			node = node.at("value");
 		}
-		Util.setJson(metaJson, metaKey, node);
-		alarmMap.put(parentKey, metaJson);
-		if (logger.isDebugEnabled())
-			logger.debug("Added alarm for key: {} : {}", parentKey, metaJson);
+		if(node.toString() == "null") {
+			alarmMap.remove(parentKey);
+		} else {
+			metaJson = alarmMap.get(parentKey);
+			if (metaJson == null) {
+				metaJson = Json.object();
+			}
+			Util.setJson(metaJson, metaKey, node);
+			alarmMap.put(parentKey, metaJson);
+			if (logger.isDebugEnabled())
+				logger.debug("Added alarm for key: {} : {}", parentKey, metaJson);
 
+		}
 	}
 
 	protected void check(Message message, String key, Json alarmDef, Json node) {
@@ -171,12 +180,12 @@ public class AlarmHandler extends BaseHandler {
 							if (warn.equals(state)) {
 								// notification.at(value).set("method", alarmDef.at("warnMethod"));
 								sendJson(message, key,
-										getNotification(state, zone.at("message"), alarmDef.at("warnMethod")));
+										getNotification(state, zone.at("message"), zone.at("method")));
 							}
 							if (alarm.equals(state)) {
 								// notification.at(value).set("method", alarmDef.at("alarmMethod"));
 								sendJson(message, key,
-										getNotification(state, zone.at("message"), alarmDef.at("alarmMethod")));
+										getNotification(state, zone.at("message"), zone.at("method")));
 							}
 							if (logger.isDebugEnabled())
 								logger.debug("  Sending alarm: {}={}", key, state);
@@ -189,7 +198,6 @@ public class AlarmHandler extends BaseHandler {
 				}
 			}
 		}
-
 	}
 
 	private Json getNotification(String state, Json message, Json warnMethod) {
