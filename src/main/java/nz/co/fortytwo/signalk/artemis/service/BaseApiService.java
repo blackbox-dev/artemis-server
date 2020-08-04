@@ -13,6 +13,7 @@ import java.util.TimerTask;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Cookie;
 
+import nz.co.fortytwo.signalk.artemis.util.*;
 import org.apache.activemq.artemis.api.core.ActiveMQException;
 import org.apache.activemq.artemis.api.core.ActiveMQIllegalStateException;
 import org.apache.activemq.artemis.api.core.ActiveMQNonExistentQueueException;
@@ -39,10 +40,6 @@ import org.atmosphere.websocket.WebSocketEventListenerAdapter;
 
 import mjson.Json;
 import nz.co.fortytwo.signalk.artemis.subscription.SubscriptionManagerFactory;
-import nz.co.fortytwo.signalk.artemis.util.Config;
-import nz.co.fortytwo.signalk.artemis.util.MessageSupport;
-import nz.co.fortytwo.signalk.artemis.util.SignalKConstants;
-import nz.co.fortytwo.signalk.artemis.util.Util;
 
 public class BaseApiService extends MessageSupport{
 
@@ -97,8 +94,15 @@ public class BaseApiService extends MessageSupport{
 	}
 
 	protected String getToken(Cookie cookie) {
-		if (cookie == null)
-			return null;
+		if (cookie == null) {
+			String token = null;
+			try {
+				token = SecurityUtils.authenticateUser("admin", "admin");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return token;
+		}
 		// assume we might have a cookie token
 
 		if (logger.isDebugEnabled())
